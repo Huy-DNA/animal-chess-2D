@@ -1,4 +1,5 @@
-from typing import List, Optional
+from abc import ABC, abstractmethod
+from typing import List, Optional, Tuple
 from dataclasses import dataclass
 from core.piece import Color
 
@@ -42,7 +43,25 @@ class Cell:
     y: int
 
 
-class Map:
+class Map(ABC):
+    @abstractmethod
+    def width(self) -> int:
+        pass
+
+    @abstractmethod
+    def height(self) -> int:
+        pass
+
+    @abstractmethod
+    def __getitem__(self, indices: Tuple[int, int]) -> Optional[Location]:
+        pass
+
+    @abstractmethod
+    def get_adjacent_locations(self, x: int, y: int) -> List[Cell]:
+        pass
+
+
+class DefaultMap(Map):
     __locations: List[List[Location]]
 
     def __init__(self):
@@ -136,32 +155,25 @@ class Map:
     def height(self) -> int:
         return len(self.__locations)
 
-    def __getitem__(self, x: int, y: int) -> Location:
-        if x >= self.width() or x < 0:
-            raise RuntimeError("Invalid index x")
-        if y >= self.height() or y < 0:
-            raise RuntimeError("Invalid index y")
-        return self.__locations[x][y]
-
-    def at(self, x: int, y: int) -> Optional[Location]:
-        if x >= self.width() or x < 0:
+    def __getitem__(self, indices: Tuple[int, int]) -> Optional[Location]:
+        if indices[0] >= self.width() or indices[0] < 0:
             return None
-        if y >= self.height() or y < 0:
+        if indices[1] >= self.height() or indices[1] < 0:
             return None
-        return self.__locations[x][y]
+        return self.__locations[indices[0]][indices[1]]
 
     def get_adjacent_locations(self, x: int, y: int) -> List[Cell]:
         res = []
-        left = self.at(x - 1, y)
+        left = self[x - 1, y]
         if left:
             res.append(Cell(left, x - 1, y))
-        right = self.at(x + 1, y)
+        right = self[x + 1, y]
         if right:
             res.append(Cell(right, x + 1, y))
-        up = self.at(x, y - 1)
+        up = self[x, y - 1]
         if up:
             res.append(Cell(up, x, y - 1))
-        down = self.at(x, y + 1)
+        down = self[x, y + 1]
         if down:
             res.append(Cell(down, x, y + 1))
         return res
