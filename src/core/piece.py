@@ -9,11 +9,9 @@ class Color(Enum):
 
 class Piece(ABC):
     __color: Color
-    __current_level: int
 
     def __init__(self, color: Color):
         self.__color = color
-        self.__current_level = self.get_default_level()
 
     @abstractmethod
     def can_cross_river(self) -> bool:
@@ -27,22 +25,8 @@ class Piece(ABC):
     def get_default_level(self) -> int:
         pass
 
-    @abstractmethod
-    def can_eat(self, other: "Piece") -> bool:
-        pass
-
-    @abstractmethod
-    def can_be_eaten(self, other: "Piece") -> bool:
-        pass
-
     def get_color(self) -> Color:
         return self.__color
-
-    def get_current_level(self) -> int:
-        return self.__current_level
-
-    def set_current_level(self, level: int):
-        self.__current_level = level
 
 
 class ElephantPiece(Piece):
@@ -57,15 +41,6 @@ class ElephantPiece(Piece):
     def get_default_level(self) -> int:
         return self.LEVEL
 
-    def can_eat(self, other: "Piece") -> bool:
-        return other.get_current_level() <= self.get_current_level()
-
-    def can_be_eaten(self, other: "Piece") -> bool:
-        return (
-            other.get_current_level() >= self.get_current_level()
-            or type(other) is MousePiece
-        )
-
 
 class LionPiece(Piece):
     LEVEL: int = 7
@@ -78,12 +53,6 @@ class LionPiece(Piece):
 
     def get_default_level(self) -> int:
         return self.LEVEL
-
-    def can_eat(self, other: "Piece") -> bool:
-        return other.get_current_level() <= self.get_current_level()
-
-    def can_be_eaten(self, other: "Piece") -> bool:
-        return other.get_current_level() >= self.get_current_level()
 
 
 class TigerPiece(Piece):
@@ -98,12 +67,6 @@ class TigerPiece(Piece):
     def get_default_level(self) -> int:
         return self.LEVEL
 
-    def can_eat(self, other: "Piece") -> bool:
-        return other.get_current_level() <= self.get_current_level()
-
-    def can_be_eaten(self, other: "Piece") -> bool:
-        return other.get_current_level() >= self.get_current_level()
-
 
 class LeopardPiece(Piece):
     LEVEL: int = 5
@@ -116,12 +79,6 @@ class LeopardPiece(Piece):
 
     def get_default_level(self) -> int:
         return self.LEVEL
-
-    def can_eat(self, other: "Piece") -> bool:
-        return other.get_current_level() <= self.get_current_level()
-
-    def can_be_eaten(self, other: "Piece") -> bool:
-        return other.get_current_level() >= self.get_current_level()
 
 
 class DogPiece(Piece):
@@ -136,12 +93,6 @@ class DogPiece(Piece):
     def get_default_level(self) -> int:
         return self.LEVEL
 
-    def can_eat(self, other: "Piece") -> bool:
-        return other.get_current_level() <= self.get_current_level()
-
-    def can_be_eaten(self, other: "Piece") -> bool:
-        return other.get_current_level() >= self.get_current_level()
-
 
 class WolfPiece(Piece):
     LEVEL: int = 3
@@ -154,12 +105,6 @@ class WolfPiece(Piece):
 
     def get_default_level(self) -> int:
         return self.LEVEL
-
-    def can_eat(self, other: "Piece") -> bool:
-        return other.get_current_level() <= self.get_current_level()
-
-    def can_be_eaten(self, other: "Piece") -> bool:
-        return other.get_current_level() >= self.get_current_level()
 
 
 class CatPiece(Piece):
@@ -174,12 +119,6 @@ class CatPiece(Piece):
     def get_default_level(self) -> int:
         return self.LEVEL
 
-    def can_eat(self, other: "Piece") -> bool:
-        return other.get_current_level() <= self.get_current_level()
-
-    def can_be_eaten(self, other: "Piece") -> bool:
-        return other.get_current_level() >= self.get_current_level()
-
 
 class MousePiece(Piece):
     LEVEL: int = 1
@@ -192,12 +131,3 @@ class MousePiece(Piece):
 
     def get_default_level(self) -> int:
         return self.LEVEL
-
-    def can_eat(self, other: "Piece") -> bool:
-        return (
-            other.get_current_level() <= self.get_current_level()
-            or type(other) is ElephantPiece
-        )
-
-    def can_be_eaten(self, other: "Piece") -> bool:
-        return other.get_current_level() >= self.get_current_level()
