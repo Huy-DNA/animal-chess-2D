@@ -28,6 +28,27 @@ class State:
             Piece(Color.BLUE, PieceType.MOUSE): Position(6, 6),
         }
 
+    @staticmethod
+    def get_all_pieces() -> List[Piece]:
+        return [
+            Piece(Color.RED, PieceType.ELEPHANT),
+            Piece(Color.RED, PieceType.LION),
+            Piece(Color.RED, PieceType.TIGER),
+            Piece(Color.RED, PieceType.LEOPARD),
+            Piece(Color.RED, PieceType.DOG),
+            Piece(Color.RED, PieceType.WOLF),
+            Piece(Color.RED, PieceType.CAT),
+            Piece(Color.RED, PieceType.MOUSE),
+            Piece(Color.BLUE, PieceType.ELEPHANT),
+            Piece(Color.BLUE, PieceType.LION),
+            Piece(Color.BLUE, PieceType.TIGER),
+            Piece(Color.BLUE, PieceType.LEOPARD),
+            Piece(Color.BLUE, PieceType.DOG),
+            Piece(Color.BLUE, PieceType.WOLF),
+            Piece(Color.BLUE, PieceType.CAT),
+            Piece(Color.BLUE, PieceType.MOUSE),
+        ]
+
     def is_alive(self, piece: Piece) -> bool:
         return self.__piece_positions[piece] is not None
 
@@ -41,7 +62,10 @@ class State:
         return pos
 
     def get_adjacent_cells(self, position: Position) -> List[Cell]:
-        return self.__map.get_adjacent_cells(position.x, position.y)
+        return self.__map.get_adjacent_cells(position)
+
+    def get_adjacent_non_river_cells(self, position: Position) -> List[Cell]:
+        return self.__map.get_adjacent_non_river_cells(position)
 
     def get_location(self, position: Position) -> Optional[Location]:
         return self.__map[position.x, position.y]
