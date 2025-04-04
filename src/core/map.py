@@ -39,7 +39,7 @@ class Map:
             return None
         return self.locations[indices[0]][indices[1]]
 
-    def get_adjacent_locations(self, x: int, y: int) -> List[Cell]:
+    def get_adjacent_cells(self, x: int, y: int) -> List[Cell]:
         res = []
         left = self[x - 1, y]
         if left:
