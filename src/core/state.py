@@ -40,7 +40,7 @@ class State:
             raise RuntimeError("Invariant not upheld: The piece is already dead")
         return pos
 
-    def get_adjacent_cells(self, position) -> List[Cell]:
+    def get_adjacent_cells(self, position: Position) -> List[Cell]:
         return self.__map.get_adjacent_cells(position.x, position.y)
 
     def get_location(self, position: Position) -> Optional[Location]:
@@ -51,6 +51,13 @@ class State:
         if loc is None:
             raise RuntimeError("Invariant not upheld: Invalid position")
         return loc
+
+    def get_piece_at_position(self, position: Position) -> Optional[Piece]:
+        for piece in self.__piece_positions:
+            pos = self.__piece_positions[piece]
+            if pos == position:
+                return piece
+        return None
 
     def set_piece_position(self, piece: Piece, position: Position):
         self.__piece_positions[piece] = position
