@@ -18,7 +18,7 @@ class Color(Enum):
     BLUE = 1
 
 
-@dataclass
+@dataclass(frozen=True)
 class Piece:
     color: Color
     type: PieceType
