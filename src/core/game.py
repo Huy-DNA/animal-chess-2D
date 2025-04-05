@@ -1,6 +1,6 @@
 from typing import List, Optional, Union
 from core.map import Cell, Position
-from core.piece import Piece, PieceType
+from core.piece import Color, Piece, PieceType
 from core.state import State
 
 
@@ -56,6 +56,9 @@ class Game:
         return not_blocked_by_other_pieces_cells
 
     def move(self, piece: Piece, position: Position) -> Union[bool, Optional[Piece]]:
+        if self.is_game_over():
+            return False
+
         possible_pos = map(lambda x: x.position, self.get_possible_moves(piece))
         if position not in possible_pos:
             return False
@@ -65,6 +68,17 @@ class Game:
             self.__state.kill_piece(replaced_piece)
         self.__state.set_piece_position(piece, position)
         return replaced_piece or True
+
+    def is_game_over(self) -> Optional[Color]:
+        for piece in self.__state.get_all_pieces():
+            pos = self.__state.get_piece_position(piece)
+            if pos is None:
+                continue
+            loc = self.__state.get_location_definitely(pos)
+            if loc.cave_color is None:
+                continue
+            return loc.cave_color
+        return None
 
     def get_state(self) -> State:
         return self.__state
