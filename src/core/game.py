@@ -49,6 +49,8 @@ class Game:
             elif piece.type == PieceType.MOUSE and adj_piece.type == PieceType.ELEPHANT:
                 not_blocked_by_other_pieces_cells.append(cell)
                 continue
+            elif piece.type == PieceType.ELEPHANT and adj_piece.type == PieceType.MOUSE:
+                continue
             elif piece.get_default_level() >= adj_piece.get_default_level():
                 not_blocked_by_other_pieces_cells.append(cell)
                 continue
