@@ -12,8 +12,8 @@
         packages = with pkgs; [
           uv
           ruff
-          python312
-          python312Packages.pygame
+          python311
+          python311Packages.pygame
           neovim
         ];
         shellHook = ''
