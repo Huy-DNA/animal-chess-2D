@@ -1,0 +1,11 @@
+[project]
+name = "animal-chess_client"
+version = "0.1.0"
+description = "Animal Chess client"
+readme = "README.md"
+requires-python = "<3.12,>=3.11"
+dependencies = [
+]
+
+[tool.uv.sources]
+core = { workspace = true }

@@ -1,10 +1,33 @@
 version = 1
 requires-python = "==3.11.*"
 
+[manifest]
+members = [
+    "animal-chess",
+    "animal-chess-client",
+    "animal-chess-core",
+    "animal-chess-server",
+]
+
 [[package]]
 name = "animal-chess"
 version = "0.1.0"
 source = { virtual = "." }
+
+[[package]]
+name = "animal-chess-client"
+version = "0.1.0"
+source = { virtual = "packages/client" }
+
+[[package]]
+name = "animal-chess-core"
+version = "0.1.0"
+source = { virtual = "packages/core" }
+
+[[package]]
+name = "animal-chess-server"
+version = "0.1.0"
+source = { virtual = "packages/server" }
 dependencies = [
     { name = "podsixnet" },
 ]

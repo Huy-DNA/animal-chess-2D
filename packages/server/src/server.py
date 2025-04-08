@@ -15,4 +15,4 @@ class GameServer(Server):
         super().__init__(localaddr=(ip, port), listeners=listeners)
 
     def Connected(self, channel: ClientChannel, addr: str):
-        pass
+        print(channel)
