@@ -1,7 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
-class Controller:
+class Server:
     __ip: str
     __port: int
     __server: HTTPServer
