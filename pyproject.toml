@@ -22,5 +22,5 @@ members = [
 venvPath = "."
 venv = ".venv"
 include = [
-  "src/*"
+  "packages/*"
 ]

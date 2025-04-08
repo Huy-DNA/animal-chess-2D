@@ -1,0 +1,4 @@
+from PodSixNet.Connection import ConnectionListener
+
+connection = ConnectionListener()
+connection.Connect()

@@ -6,3 +6,10 @@ readme = "README.md"
 requires-python = "<3.12,>=3.11"
 dependencies = [
 ]
+
+[tool.pyright]
+venvPath = ".."
+venv = "../.venv"
+include = [
+  "src/*"
+]
