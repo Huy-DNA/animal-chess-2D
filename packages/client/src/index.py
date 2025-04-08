@@ -1,9 +1,12 @@
 import os
+from time import sleep
 from dotenv import load_dotenv
-from PodSixNet.Connection import ConnectionListener
+from PodSixNet.Connection import connection
 
 load_dotenv()
 SERVER_ADDRESS = os.getenv("SERVER_ADDRESS") or "0.0.0.0"
 SERVER_PORT = int(os.getenv("SERVER_PORT") or 8686)
-connection = ConnectionListener()
-connection.Connect((SERVER_ADDRESS, SERVER_PORT))
+connection.DoConnect((SERVER_ADDRESS, SERVER_PORT))
+while True:
+    connection.Pump()
+    sleep(0.0001)
