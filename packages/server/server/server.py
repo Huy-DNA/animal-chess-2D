@@ -20,6 +20,15 @@ class ClientChannel(Channel):
             self.Send({ "status": 400, "message": "Invalid payload" })
             return
 
+    def Network_find_game(self, data):
+        pass
+
+    def Network_start_game(self, data):
+        pass
+
+    def Network_concede(self, data):
+        pass
+
     def handle_close(self):
         super().handle_close()
         self._server.remove_client(self.addr)

@@ -16,6 +16,21 @@ connection.Send(
         "position": Position.Schema().dump(Position(1, 2)),
     },
 )
+connection.Send(
+    {
+        "action": "find_game",
+    }
+)
+connection.Send(
+    {
+        "action": "start_game",
+    }
+)
+connection.Send(
+    {
+        "action": "concede",
+    }
+)
 while True:
     connection.Pump()
     sleep(0.0001)
