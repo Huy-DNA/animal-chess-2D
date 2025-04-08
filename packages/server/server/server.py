@@ -16,8 +16,8 @@ class ClientChannel(Channel):
         try:
             piece = Piece.Schema().load(data["piece"])
             pos = Position.Schema().load(data["position"])
-        except Exception as e:
-            self.Send({ "status": 400, "message": "Invalid payload" })
+        except Exception:
+            self.Send({ "action": "error", "message": "Invalid payload" })
             return
 
     def Network_find_game(self, data):
