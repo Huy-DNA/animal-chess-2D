@@ -1,3 +1,3 @@
 # Animal-chess
 
-![image](https://github.com/user-attachments/assets/65a2028b-a3ef-4cd9-a04d-7d280702860d)
+![image](https://github.com/user-attachments/assets/a9a9a482-60f7-4df9-b258-82f451879896)
