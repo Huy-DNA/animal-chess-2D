@@ -8,7 +8,7 @@ Addr = Tuple[str, int]
 class ClientChannel(Channel):
     _server: "GameServer"
 
-    def Network(self, data):
+    def Network_move(self, data):
         print(data)
 
     def handle_close(self):
