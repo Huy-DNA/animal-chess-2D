@@ -1,16 +1,36 @@
 import time
-from typing import List, Optional
+import pickle
+import os
+from typing import List, Optional, Dict, Any
 from ai.move import Move
 from core.piece import Color, PieceType
 import copy
 
 
 class MinimaxAI:
-    def __init__(self, color: Color, max_depth: int = 3):
+    def __init__(
+        self, color: Color, max_depth: int = 3, checkpoint_path: Optional[str] = None
+    ):
         self.color = color
         self.max_depth = max_depth
         self.nodes_evaluated = 0
         self.opponent_color = Color.BLUE if color == Color.RED else Color.RED
+
+        self.piece_values = {
+            PieceType.ELEPHANT: 8,
+            PieceType.LION: 7,
+            PieceType.TIGER: 6,
+            PieceType.LEOPARD: 5,
+            PieceType.WOLF: 4,
+            PieceType.DOG: 3,
+            PieceType.CAT: 2,
+            PieceType.MOUSE: 1,
+        }
+        self.den_distance_weight = 3
+        self.center_control_weight = 1
+
+        if checkpoint_path and os.path.exists(checkpoint_path):
+            self.load_checkpoint(checkpoint_path)
 
     def choose_move(self, game) -> Optional[Move]:
         self.nodes_evaluated = 0
@@ -104,22 +124,11 @@ class MinimaxAI:
         state = game.get_state()
         score = 0
 
-        piece_values = {
-            PieceType.ELEPHANT: 8,
-            PieceType.LION: 7,
-            PieceType.TIGER: 6,
-            PieceType.LEOPARD: 5,
-            PieceType.WOLF: 4,
-            PieceType.DOG: 3,
-            PieceType.CAT: 2,
-            PieceType.MOUSE: 1,
-        }
-
         for piece in state.get_all_pieces():
             if not state.is_alive(piece):
                 continue
 
-            value = piece_values[piece.type] * 10
+            value = self.piece_values[piece.type] * 10
 
             if piece.color == self.color:
                 score += value
@@ -128,13 +137,62 @@ class MinimaxAI:
 
                 enemy_den_y = 0 if self.color == Color.BLUE else 8
                 distance_to_den = abs(pos.y - enemy_den_y)
-                score += (9 - distance_to_den) * 3
+                score += (9 - distance_to_den) * self.den_distance_weight
 
                 center_x, center_y = 3, 4
                 center_dist = abs(pos.x - center_x) + abs(pos.y - center_y)
-                score += 9 - center_dist
+                score += (9 - center_dist) * self.center_control_weight
 
             else:
                 score -= value
 
         return score
+
+    def save_checkpoint(self, path: str) -> None:
+        checkpoint_data = {
+            "color": self.color,
+            "max_depth": self.max_depth,
+            "piece_values": self.piece_values,
+            "den_distance_weight": self.den_distance_weight,
+            "center_control_weight": self.center_control_weight,
+        }
+
+        with open(path, "wb") as f:
+            pickle.dump(checkpoint_data, f)
+
+        print(f"MinimaxAI checkpoint saved to {path}")
+
+    def load_checkpoint(self, path: str) -> None:
+        try:
+            with open(path, "rb") as f:
+                checkpoint_data = pickle.load(f)
+
+            self.color = checkpoint_data.get("color", self.color)
+            self.max_depth = checkpoint_data.get("max_depth", self.max_depth)
+            self.piece_values = checkpoint_data.get("piece_values", self.piece_values)
+            self.den_distance_weight = checkpoint_data.get(
+                "den_distance_weight", self.den_distance_weight
+            )
+            self.center_control_weight = checkpoint_data.get(
+                "center_control_weight", self.center_control_weight
+            )
+
+            self.opponent_color = Color.BLUE if self.color == Color.RED else Color.RED
+
+            print(f"MinimaxAI checkpoint loaded from {path}")
+        except Exception as e:
+            print(f"Error loading checkpoint: {e}")
+
+
+def create_or_load_minimax_ai(
+    color: Color, max_depth: int = 3, checkpoint_path: Optional[str] = None
+) -> MinimaxAI:
+    return MinimaxAI(color=color, max_depth=max_depth, checkpoint_path=checkpoint_path)
+
+
+def play_with_minimax_ai(game, ai: MinimaxAI):
+    move = ai.choose_move(game)
+    if move:
+        game.move(move.piece, move.to_pos)
+        return True
+    return False

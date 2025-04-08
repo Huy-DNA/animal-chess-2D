@@ -2,7 +2,9 @@ import time
 import random
 import math
 import copy
-from typing import List, Optional
+import pickle
+import os
+from typing import List, Optional, Dict, Any
 from ai.minimax import MinimaxAI
 from ai.move import Move
 from core.game import Game
@@ -50,11 +52,22 @@ class MCTSNode:
 
 
 class MCTSAI:
-    def __init__(self, color: Color, num_simulations=1000, simulation_depth=50):
+    def __init__(
+        self,
+        color: Color,
+        num_simulations=1000,
+        simulation_depth=50,
+        exploration_constant=1.41,
+        checkpoint_path: Optional[str] = None,
+    ):
         self.color = color
         self.num_simulations = num_simulations
         self.simulation_depth = simulation_depth
+        self.exploration_constant = exploration_constant
         self.opponent_color = Color.BLUE if color == Color.RED else Color.RED
+
+        if checkpoint_path and os.path.exists(checkpoint_path):
+            self.load_checkpoint(checkpoint_path)
 
     def choose_move(self, game) -> Optional[Move]:
         start_time = time.time()
@@ -135,9 +148,9 @@ class MCTSAI:
 
         winner = sim_game.is_game_over()
         if winner == self.color:
-            return 1.0  # Win
+            return 1.0
         elif winner == self.opponent_color:
-            return 0.0  # Loss
+            return 0.0
         else:
             state = sim_game.get_state()
 
@@ -154,13 +167,76 @@ class MCTSAI:
 
             total_pieces = our_pieces + opponent_pieces
             if total_pieces == 0:
-                return 0.5  # Draw
+                return 0.5
             return our_pieces / total_pieces
 
+    def save_checkpoint(self, path: str) -> None:
+        checkpoint_data = {
+            "color": self.color,
+            "num_simulations": self.num_simulations,
+            "simulation_depth": self.simulation_depth,
+            "exploration_constant": self.exploration_constant,
+        }
 
-def self_play_training(num_games=100, max_moves=200):
-    minimax_ai = MinimaxAI(Color.RED, max_depth=3)
-    mcts_ai = MCTSAI(Color.BLUE, num_simulations=500)
+        with open(path, "wb") as f:
+            pickle.dump(checkpoint_data, f)
+
+        print(f"MCTSAI checkpoint saved to {path}")
+
+    def load_checkpoint(self, path: str) -> None:
+        try:
+            with open(path, "rb") as f:
+                checkpoint_data = pickle.load(f)
+
+            self.color = checkpoint_data.get("color", self.color)
+            self.num_simulations = checkpoint_data.get(
+                "num_simulations", self.num_simulations
+            )
+            self.simulation_depth = checkpoint_data.get(
+                "simulation_depth", self.simulation_depth
+            )
+            self.exploration_constant = checkpoint_data.get(
+                "exploration_constant", self.exploration_constant
+            )
+
+            self.opponent_color = Color.BLUE if self.color == Color.RED else Color.RED
+
+            print(f"MCTSAI checkpoint loaded from {path}")
+        except Exception as e:
+            print(f"Error loading checkpoint: {e}")
+
+
+def create_or_load_mcts_ai(
+    color: Color,
+    num_simulations=1000,
+    simulation_depth=50,
+    checkpoint_path: Optional[str] = None,
+) -> MCTSAI:
+    return MCTSAI(
+        color=color,
+        num_simulations=num_simulations,
+        simulation_depth=simulation_depth,
+        checkpoint_path=checkpoint_path,
+    )
+
+
+def play_with_mcts_ai(game, ai: MCTSAI):
+    move = ai.choose_move(game)
+    if move:
+        game.move(move.piece, move.to_pos)
+        return True
+    return False
+
+
+def self_play_training(
+    num_games=100,
+    max_moves=200,
+    minimax_checkpoint=None,
+    mcts_checkpoint=None,
+    save_checkpoints=True,
+):
+    minimax_ai = MinimaxAI(Color.RED, max_depth=3, checkpoint_path=minimax_checkpoint)
+    mcts_ai = MCTSAI(Color.BLUE, num_simulations=500, checkpoint_path=mcts_checkpoint)
 
     results = {"RED": 0, "BLUE": 0, "DRAW": 0}
 
@@ -203,5 +279,9 @@ def self_play_training(num_games=100, max_moves=200):
     print(f"RED (Minimax) wins: {results['RED']} ({results['RED']/num_games*100:.1f}%)")
     print(f"BLUE (MCTS) wins: {results['BLUE']} ({results['BLUE']/num_games*100:.1f}%)")
     print(f"Draws: {results['DRAW']} ({results['DRAW']/num_games*100:.1f}%)")
+
+    if save_checkpoints:
+        minimax_ai.save_checkpoint("minimax_latest.pkl")
+        mcts_ai.save_checkpoint("mcts_latest.pkl")
 
     return results
