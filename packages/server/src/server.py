@@ -10,7 +10,7 @@ class ClientChannel(Channel):
 class GameServer(Server):
     channelClass = ClientChannel
 
-    def __init__(self, *, ip: str = "0.0.0.0", port: int = 8686, listeners=10):
+    def __init__(self, *, ip: str, port: int, listeners=10):
         print(f"Server listening on {ip}:{port}...")
         super().__init__(localaddr=(ip, port), listeners=listeners)
 
