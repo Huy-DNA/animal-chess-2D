@@ -28,7 +28,6 @@ class GameServer(Server):
 
     def Connected(self, channel: ClientChannel, addr: Addr):
         self.__registered_clients[addr] = channel
-        print(self.__registered_clients)
 
     def remove_client(self, addr: Addr):
         self.__registered_clients.pop(addr)
