@@ -1,3 +1,5 @@
+from core.piece import Piece
+from core.map import Position
 from typing import Dict, Tuple
 from PodSixNet.Channel import Channel
 from PodSixNet.Server import Server
@@ -9,7 +11,14 @@ class ClientChannel(Channel):
     _server: "GameServer"
 
     def Network_move(self, data):
-        print(data)
+        piece: Piece
+        pos: Position
+        try:
+            piece = Piece.Schema().load(data["piece"])
+            pos = Position.Schema().load(data["position"])
+        except Exception as e:
+            self.Send({ "status": 400, "message": "Invalid payload" })
+            return
 
     def handle_close(self):
         super().handle_close()
