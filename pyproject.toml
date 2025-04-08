@@ -7,13 +7,13 @@ requires-python = "<3.12,>=3.11"
 dependencies = [
   "core",
   "server",
-  "client"
+  "client",
 ]
 
 [tool.uv.sources]
 client = { workspace = true }
-core = { workspace = true }
 server = { workspace = true }
+core = { workspace = true }
 
 [tool.uv.workspace]
 members = [

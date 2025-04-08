@@ -1,5 +1,5 @@
 from typing import List, Optional, Tuple
-from dataclasses import dataclass
+from marshmallow_dataclass import dataclass
 from core.piece import Color
 
 

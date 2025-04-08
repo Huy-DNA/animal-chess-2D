@@ -5,17 +5,18 @@ description = "Animal Chess core"
 readme = "README.md"
 requires-python = "<3.12,>=3.11"
 dependencies = [
+    "marshmallow-dataclass>=8.7.1",
 ]
 
 [tool.pyright]
 venvPath = ".."
 venv = "../.venv"
 include = [
-  "src/*"
+  "core/*"
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src"]
+packages = ["core"]
 
 [build-system]
 requires = ["hatchling"]
