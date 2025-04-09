@@ -4,7 +4,7 @@ import math
 import copy
 import pickle
 import os
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from move import Move
 from core.piece import Color
 
@@ -19,6 +19,12 @@ class MCTSNode:
         self.visits = 0
         self.wins = 0
         self.untried_moves = None
+
+    def __getstate__(self):
+        """Custom state for pickle that excludes parent to avoid recursion issues"""
+        state = self.__dict__.copy()
+        state["parent"] = None
+        return state
 
     def get_untried_moves(self, ai):
         if self.untried_moves is None:
@@ -63,6 +69,7 @@ class MCTSAI:
         self.simulation_depth = simulation_depth
         self.exploration_constant = exploration_constant
         self.opponent_color = Color.BLUE if color == Color.RED else Color.RED
+        self.tree_root = None
 
         if checkpoint_path and os.path.exists(checkpoint_path):
             self.load_checkpoint(checkpoint_path)
@@ -70,14 +77,23 @@ class MCTSAI:
     def choose_move(self, game) -> Optional[Move]:
         start_time = time.time()
 
-        root = MCTSNode(game, player_color=self.color)
+        if self.tree_root is None or not self._is_state_compatible(
+            self.tree_root.game, game
+        ):
+            root = MCTSNode(game, player_color=self.color)
+            self.tree_root = root
+        else:
+            print("Reusing existing MCTS tree")
+            root = self.tree_root
 
         for _ in range(self.num_simulations):
             node = root
 
+            # Selection phase
             while node.children and not node.get_untried_moves(self):
                 node = node.select_child()
 
+            # Expansion phase
             if node.get_untried_moves(self):
                 next_color = (
                     self.opponent_color
@@ -90,8 +106,10 @@ class MCTSAI:
 
                 node = node.add_child(move, next_color)
 
+            # Simulation phase
             result = self._simulate(node)
 
+            # Backpropagation phase
             while node:
                 node.update(result)
                 node = node.parent
@@ -102,15 +120,30 @@ class MCTSAI:
 
         best_child = max(root.children, key=lambda c: c.visits)
 
+        # Update the root to the chosen child for future use
+        self.tree_root = best_child
+        # Detach from parent to avoid memory issues
+        self.tree_root.parent = None
+
         end_time = time.time()
         print(
             f"MCTS ran {self.num_simulations} simulations in {end_time - start_time:.2f} seconds"
         )
         print(
-            f"Best move: {best_child.move} with {best_child.visits} visits and win rate {best_child.wins/best_child.visits:.2f}"
+            f"Best move: {best_child.move} with {best_child.visits} visits and win rate {best_child.wins / best_child.visits:.2f}"
         )
 
         return best_child.move
+
+    def _is_state_compatible(self, saved_game, current_game):
+        """Check if the saved game state matches the current game state"""
+        try:
+            saved_state = saved_game.get_state()
+            current_state = current_game.get_state()
+
+            return saved_state == current_state
+        except:
+            return False
 
     def _get_all_possible_moves(self, game, color: Color) -> List[Move]:
         moves = []
@@ -174,12 +207,29 @@ class MCTSAI:
             "num_simulations": self.num_simulations,
             "simulation_depth": self.simulation_depth,
             "exploration_constant": self.exploration_constant,
+            "tree_root": self.tree_root,
+        }
+
+        try:
+            with open(path, "wb") as f:
+                pickle.dump(checkpoint_data, f)
+            print(f"MCTSAI checkpoint with tree state saved to {path}")
+        except Exception as e:
+            print(f"Error saving checkpoint: {e}")
+            self._save_basic_checkpoint(path)
+
+    def _save_basic_checkpoint(self, path: str) -> None:
+        """Fallback function to save just the parameters if tree saving fails"""
+        checkpoint_data = {
+            "color": self.color,
+            "num_simulations": self.num_simulations,
+            "simulation_depth": self.simulation_depth,
+            "exploration_constant": self.exploration_constant,
         }
 
         with open(path, "wb") as f:
             pickle.dump(checkpoint_data, f)
-
-        print(f"MCTSAI checkpoint saved to {path}")
+        print(f"MCTSAI basic checkpoint (without tree) saved to {path}")
 
     def load_checkpoint(self, path: str) -> None:
         try:
@@ -197,11 +247,16 @@ class MCTSAI:
                 "exploration_constant", self.exploration_constant
             )
 
+            if "tree_root" in checkpoint_data:
+                self.tree_root = checkpoint_data["tree_root"]
+                print("MCTS tree structure loaded from checkpoint")
+
             self.opponent_color = Color.BLUE if self.color == Color.RED else Color.RED
 
             print(f"MCTSAI checkpoint loaded from {path}")
         except Exception as e:
             print(f"Error loading checkpoint: {e}")
+            self.tree_root = None
 
 
 def create_or_load_mcts_ai(

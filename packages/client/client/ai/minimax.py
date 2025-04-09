@@ -1,16 +1,12 @@
 import time
-import pickle
-import os
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
 from move import Move
 from core.piece import Color, PieceType
 import copy
 
 
 class MinimaxAI:
-    def __init__(
-        self, color: Color, max_depth: int = 3, checkpoint_path: Optional[str] = None
-    ):
+    def __init__(self, color: Color, max_depth: int = 3):
         self.color = color
         self.max_depth = max_depth
         self.nodes_evaluated = 0
@@ -28,9 +24,6 @@ class MinimaxAI:
         }
         self.den_distance_weight = 3
         self.center_control_weight = 1
-
-        if checkpoint_path and os.path.exists(checkpoint_path):
-            self.load_checkpoint(checkpoint_path)
 
     def choose_move(self, game) -> Optional[Move]:
         self.nodes_evaluated = 0
@@ -148,46 +141,9 @@ class MinimaxAI:
 
         return score
 
-    def save_checkpoint(self, path: str) -> None:
-        checkpoint_data = {
-            "color": self.color,
-            "max_depth": self.max_depth,
-            "piece_values": self.piece_values,
-            "den_distance_weight": self.den_distance_weight,
-            "center_control_weight": self.center_control_weight,
-        }
 
-        with open(path, "wb") as f:
-            pickle.dump(checkpoint_data, f)
-
-        print(f"MinimaxAI checkpoint saved to {path}")
-
-    def load_checkpoint(self, path: str) -> None:
-        try:
-            with open(path, "rb") as f:
-                checkpoint_data = pickle.load(f)
-
-            self.color = checkpoint_data.get("color", self.color)
-            self.max_depth = checkpoint_data.get("max_depth", self.max_depth)
-            self.piece_values = checkpoint_data.get("piece_values", self.piece_values)
-            self.den_distance_weight = checkpoint_data.get(
-                "den_distance_weight", self.den_distance_weight
-            )
-            self.center_control_weight = checkpoint_data.get(
-                "center_control_weight", self.center_control_weight
-            )
-
-            self.opponent_color = Color.BLUE if self.color == Color.RED else Color.RED
-
-            print(f"MinimaxAI checkpoint loaded from {path}")
-        except Exception as e:
-            print(f"Error loading checkpoint: {e}")
-
-
-def create_or_load_minimax_ai(
-    color: Color, max_depth: int = 3, checkpoint_path: Optional[str] = None
-) -> MinimaxAI:
-    return MinimaxAI(color=color, max_depth=max_depth, checkpoint_path=checkpoint_path)
+def create_or_load_minimax_ai(color: Color, max_depth: int = 3) -> MinimaxAI:
+    return MinimaxAI(color=color, max_depth=max_depth)
 
 
 def play_with_minimax_ai(game, ai: MinimaxAI):

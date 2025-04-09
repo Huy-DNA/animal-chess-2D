@@ -5,13 +5,12 @@ from minimax import MinimaxAI
 
 
 def self_play_training(
-    num_games=100,
-    max_moves=200,
-    minimax_checkpoint=None,
+    num_games=150,
+    max_moves=300,
     mcts_checkpoint=None,
     save_checkpoints=True,
 ):
-    minimax_ai = MinimaxAI(Color.RED, max_depth=3, checkpoint_path=minimax_checkpoint)
+    minimax_ai = MinimaxAI(Color.RED, max_depth=3)
     mcts_ai = MCTSAI(Color.BLUE, num_simulations=500, checkpoint_path=mcts_checkpoint)
 
     results = {"RED": 0, "BLUE": 0, "DRAW": 0}
@@ -61,7 +60,6 @@ def self_play_training(
     print(f"Draws: {results['DRAW']} ({results['DRAW'] / num_games * 100:.1f}%)")
 
     if save_checkpoints:
-        minimax_ai.save_checkpoint("minimax_latest.pkl")
         mcts_ai.save_checkpoint("mcts_latest.pkl")
 
     return results
