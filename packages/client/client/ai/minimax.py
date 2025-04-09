@@ -2,7 +2,7 @@ import time
 import pickle
 import os
 from typing import List, Optional, Dict, Any
-from ai.move import Move
+from move import Move
 from core.piece import Color, PieceType
 import copy
 

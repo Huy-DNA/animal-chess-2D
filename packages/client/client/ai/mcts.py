@@ -4,9 +4,9 @@ import math
 import copy
 import pickle
 import os
-from typing import List, Optional, Dict, Any
-from ai.minimax import MinimaxAI
-from ai.move import Move
+from typing import List, Optional
+from minimax import MinimaxAI
+from move import Move
 from core.game import Game
 from core.piece import Color
 
