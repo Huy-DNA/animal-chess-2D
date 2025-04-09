@@ -45,9 +45,9 @@ class Map:
         return len(self.locations)
 
     def __getitem__(self, indices: Tuple[int, int]) -> Optional[Location]:
-        if indices[0] >= self.width() or indices[0] < 0:
+        if indices[0] >= self.height() or indices[0] < 0:
             return None
-        if indices[1] >= self.height() or indices[1] < 0:
+        if indices[1] >= self.width() or indices[1] < 0:
             return None
         return self.locations[indices[0]][indices[1]]
 
@@ -84,65 +84,65 @@ class Map:
         return res
 
     def get_left_cell(self, pos: Position) -> Optional[Cell]:
-        loc = self[pos.x - 1, pos.y]
+        loc = self[pos.y, pos.x - 1]
         if loc is None:
             return None
         return Cell(loc, Position(pos.x - 1, pos.y))
 
     def get_right_cell(self, pos: Position) -> Optional[Cell]:
-        loc = self[pos.x + 1, pos.y]
+        loc = self[pos.y, pos.x + 1]
         if loc is None:
             return None
         return Cell(loc, Position(pos.x + 1, pos.y))
 
     def get_up_cell(self, pos: Position) -> Optional[Cell]:
-        loc = self[pos.x, pos.y - 1]
+        loc = self[pos.y - 1, pos.x]
         if loc is None:
             return None
         return Cell(loc, Position(pos.x, pos.y - 1))
 
     def get_down_cell(self, pos: Position) -> Optional[Cell]:
-        loc = self[pos.x, pos.y + 1]
+        loc = self[pos.y + 1, pos.x]
         if loc is None:
             return None
         return Cell(loc, Position(pos.x, pos.y + 1))
 
     def get_non_river_left_cell(self, pos: Position) -> Optional[Cell]:
         pos = Position(pos.x - 1, pos.y)
-        loc = self[pos.x, pos.y]
+        loc = self[pos.y, pos.x]
         while loc is not None and loc.is_river:
             pos = Position(pos.x - 1, pos.y)
-            loc = self[pos.x, pos.y]
+            loc = self[pos.y, pos.x]
         if loc is None:
             return None
         return Cell(loc, pos)
 
     def get_non_river_right_cell(self, pos: Position) -> Optional[Cell]:
         pos = Position(pos.x + 1, pos.y)
-        loc = self[pos.x, pos.y]
+        loc = self[pos.y, pos.x]
         while loc is not None and loc.is_river:
             pos = Position(pos.x + 1, pos.y)
-            loc = self[pos.x, pos.y]
+            loc = self[pos.y, pos.x]
         if loc is None:
             return None
         return Cell(loc, pos)
 
     def get_non_river_up_cell(self, pos: Position) -> Optional[Cell]:
         pos = Position(pos.x, pos.y - 1)
-        loc = self[pos.x, pos.y]
+        loc = self[pos.y, pos.x]
         while loc is not None and loc.is_river:
             pos = Position(pos.x, pos.y - 1)
-            loc = self[pos.x, pos.y]
+            loc = self[pos.y, pos.x]
         if loc is None:
             return None
         return Cell(loc, pos)
 
     def get_non_river_down_cell(self, pos: Position) -> Optional[Cell]:
         pos = Position(pos.x, pos.y + 1)
-        loc = self[pos.x, pos.y]
+        loc = self[pos.y, pos.x]
         while loc is not None and loc.is_river:
             pos = Position(pos.x, pos.y + 1)
-            loc = self[pos.x, pos.y]
+            loc = self[pos.y, pos.x]
         if loc is None:
             return None
         return Cell(loc, pos)

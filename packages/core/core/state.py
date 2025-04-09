@@ -68,10 +68,10 @@ class State:
         return self.__map.get_adjacent_non_river_cells(position)
 
     def get_location(self, position: Position) -> Optional[Location]:
-        return self.__map[position.x, position.y]
+        return self.__map[position.y, position.x]
 
     def get_location_definitely(self, position: Position) -> Location:
-        loc = self.__map[position.x, position.y]
+        loc = self.__map[position.y, position.x]
         if loc is None:
             raise RuntimeError("Invariant not upheld: Invalid position")
         return loc
