@@ -1,13 +1,15 @@
 from PodSixNet.Connection import ConnectionListener, connection
 from PodSixNet.EndPoint import EndPoint
-from core.piece import Piece
-from core.map import Position
-from typing import Callable
+from marshmallow_dataclass import class_schema
+from core.core.piece import Piece
+from core.core.map import Position
+from typing import Callable, Optional
 
 
 class ServerConnector(ConnectionListener):
     __connection: EndPoint
 
+    __move_made_callback: Optional[Callable[[Piece, Position, str], None]]
     def __init__(self, *, ip: str, port: int):
         super().__init__()
         self.__connection = connection
@@ -23,7 +25,7 @@ class ServerConnector(ConnectionListener):
         self.__error_callback = None
         self.__queued_callback = None
         self.__queue_cancelled_callback = None
-        self.__ready_confirmed_callback = None
+        self.__ready_confirmed_callback = None        
 
     def Network_error(self, data):
         if self.__error_callback:
@@ -74,7 +76,11 @@ class ServerConnector(ConnectionListener):
             position_data = data.get("position")
             player = data.get("player")
 
-            piece = Piece.Schema().load(piece_data)
+            if piece_data is None or position_data is None or player is None:
+                if self.__error_callback:
+                    self.__error_callback("Missing move data from server.")
+                return
+            piece = Piece.Schema().load(piece_data)            
             position = Position.Schema().load(position_data)
 
             self.__move_made_callback(piece, position, player)
