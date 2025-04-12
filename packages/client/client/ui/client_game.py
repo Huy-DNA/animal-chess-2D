@@ -155,9 +155,9 @@ class ClientGame:
                     )
 
         turn_text = ClientGame.FONT.render(
-            f"{self.game.turn().to_string().upper()}'s TURN",
+            f"{self.game.get_turn().to_string().upper()}'s TURN",
             True,
-            (255, 0, 0) if self.game.turn() == Color.RED else (0, 0, 255),
+            (255, 0, 0) if self.game.get_turn() == Color.RED else (0, 0, 255),
         )
         self.screen.blit(turn_text, (20, 20))
         elapsed = pygame.time.get_ticks() - self.turn_start_time
@@ -178,7 +178,7 @@ class ClientGame:
                     pos = self.get_board_mouse_pos(*pygame.mouse.get_pos())
                     if pos is not None:
                         piece = self.game.get_state().get_piece_at_position(pos)
-                        if piece and piece.color == self.game.turn():
+                        if piece and piece.color == self.game.get_turn():
                             self.selected_piece = piece
                             self.offset_x = pos.y - (BOARD_X + pos.x * TILE_SIZE)
                             self.offset_y = pos.x - (BOARD_Y + pos.y * TILE_SIZE)
