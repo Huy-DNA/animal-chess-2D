@@ -1,7 +1,6 @@
 from marshmallow_dataclass import dataclass
 from enum import Enum
 
-
 class PieceType(Enum):
     MOUSE = 0
     CAT = 1
