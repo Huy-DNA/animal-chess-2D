@@ -36,7 +36,6 @@ class ClientGame:
     offset_y: int
 
     def __init__(self):
-        pygame.init()
         pygame.display.set_caption("Animal chess")
         self.game = Game()
 
@@ -257,5 +256,6 @@ class ClientGame:
 
 
 if __name__ == "__main__":
+    pygame.init()
     game = ClientGame()
     game.run()
