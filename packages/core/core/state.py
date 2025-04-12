@@ -96,3 +96,6 @@ class State:
 
     def next_turn(self):
         self.__turn = Color.BLUE if self.__turn == Color.RED else Color.RED
+
+    def get_map(self) -> Map:
+        return self.__map
