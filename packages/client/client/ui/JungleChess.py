@@ -158,6 +158,6 @@ class JungleChessGame:
 
         pygame.quit()
 
-# if __name__ == '__main__':
-#     jungleGame = JungleChessGame()
-#     jungleGame.run()
+if __name__ == '__main__':
+    jungleGame = JungleChessGame()
+    jungleGame.run()
