@@ -41,8 +41,6 @@ class MatchScene(GameScene):
 
         self.screen = screen
         self.selected_piece = None
-        self.offset_x = 0
-        self.offset_y = 0
 
         self.animal_images = MatchScene.load_animal_images()
         self.background_image = pygame.transform.scale(
@@ -70,8 +68,8 @@ class MatchScene(GameScene):
         self.font: Font = pygame.font.SysFont(None, 36)
 
     def get_board_mouse_pos(self, mouse_x: float, mouse_y: float) -> Optional[Position]:
-        col = (mouse_x - BOARD_X) // TILE_SIZE
-        row = (mouse_y - BOARD_Y) // TILE_SIZE
+        row = (mouse_x - BOARD_X) // TILE_SIZE
+        col = (mouse_y - BOARD_Y) // TILE_SIZE
         if 0 <= col < BOARD_COLS and 0 <= row < BOARD_ROWS:
             return Position(row, col)
         return None
@@ -210,8 +208,6 @@ class MatchScene(GameScene):
                     piece = self.game.get_state().get_piece_at_position(pos)
                     if piece and piece.color == self.game.get_turn():
                         self.selected_piece = piece
-                        self.offset_x = pos.y - (BOARD_X + pos.x * TILE_SIZE)
-                        self.offset_y = pos.x - (BOARD_Y + pos.y * TILE_SIZE)
 
             elif event.type == pygame.MOUSEBUTTONUP:
                 if self.selected_piece:
