@@ -2,6 +2,7 @@ import os
 
 
 ASSETS_PATH = os.path.join(os.path.dirname(__file__), "assets")
+CHECKPOINT_PATH = os.path.join(os.path.dirname(__file__), "../ai/checkpoints")
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 800

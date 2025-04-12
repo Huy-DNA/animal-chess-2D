@@ -1,7 +1,7 @@
 from core.game import Game
 from core.map import Color
-from mcts import MCTSAI
-from minimax import MinimaxAI
+from ai.mcts import MCTSAI
+from ai.minimax import MinimaxAI
 
 
 def self_play_training(

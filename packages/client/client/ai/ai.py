@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from core.game import Game
-from move import Move
+from ai.move import Move
 
 
 class AI(ABC):

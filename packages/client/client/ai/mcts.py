@@ -8,7 +8,7 @@ from typing import List, Optional
 
 from core.game import Game
 from ai.ai import AI
-from move import Move
+from ai.move import Move
 from core.piece import Color
 
 

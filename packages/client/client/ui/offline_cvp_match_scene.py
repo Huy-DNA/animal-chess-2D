@@ -1,4 +1,5 @@
 from enum import Enum
+import sys
 from typing import Dict, List, Optional
 from core.map import Position
 from core.piece import Color, PieceType
@@ -9,6 +10,9 @@ from pygame.event import Event
 from pygame.font import Font
 from pygame.surface import Surface
 from ai.ai import AI
+from ai.mcts import MCTSAI
+from ai import mcts
+sys.modules['mcts'] = mcts
 from ui.game_scene import GameScene, GameSceneType
 from ui.constants import (
     SCREEN_WIDTH,
@@ -18,6 +22,7 @@ from ui.constants import (
     BOARD_ROWS,
     BOARD_X,
     BOARD_Y,
+    CHECKPOINT_PATH,
     ASSETS_PATH,
 )
 from core.game import Game, Piece
@@ -75,6 +80,19 @@ class OfflineCvPMatchScene(GameScene):
         )
 
         self.font = pygame.font.SysFont(None, 36)
+
+        if mode == DifficultyMode.EASY:
+            pass
+        elif mode == DifficultyMode.MEDIUM:
+            pass
+        else:
+            self.ai = MCTSAI(
+                Color.BLUE,
+                num_simulations=1000,
+                simulation_depth=50,
+                exploration_constant=1.41,
+                checkpoint_path=os.path.join(CHECKPOINT_PATH, "mcts.pkl"),
+            )
 
     def get_board_mouse_pos(self, mouse_x: float, mouse_y: float) -> Optional[Position]:
         row = (mouse_x - BOARD_X) // TILE_SIZE
