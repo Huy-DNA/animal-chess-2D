@@ -12,7 +12,7 @@ from pygame.surface import Surface
 from ai.ai import AI
 from ai.mcts import MCTSAI
 from ai import mcts
-sys.modules['mcts'] = mcts
+from ai.minimax import MinimaxAI
 from ui.game_scene import GameScene, GameSceneType
 from ui.constants import (
     SCREEN_WIDTH,
@@ -26,6 +26,8 @@ from ui.constants import (
     ASSETS_PATH,
 )
 from core.game import Game, Piece
+
+sys.modules["mcts"] = mcts
 
 
 class DifficultyMode(Enum):
@@ -82,9 +84,9 @@ class OfflineCvPMatchScene(GameScene):
         self.font = pygame.font.SysFont(None, 36)
 
         if mode == DifficultyMode.EASY:
-            pass
+            self.ai = MinimaxAI(Color.BLUE, 5)
         elif mode == DifficultyMode.MEDIUM:
-            pass
+            self.ai = MinimaxAI(Color.BLUE, 10)
         else:
             self.ai = MCTSAI(
                 Color.BLUE,
