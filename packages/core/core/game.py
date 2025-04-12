@@ -87,4 +87,4 @@ class Game:
         return self.__state
 
     def get_turn(self) -> Color:
-        self.__state.get_turn()
+        return self.__state.get_turn()
