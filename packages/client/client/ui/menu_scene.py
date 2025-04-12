@@ -55,9 +55,9 @@ class MenuScene(GameScene):
                 for i, button in enumerate(self.buttons):
                     if button.is_clicked(mouse_pos):
                         if i == 0:
-                            return GameSceneType.MATCH
+                            pass
                         elif i == 1:
-                            return GameSceneType.MATCH
+                            return GameSceneType.OFFLINE_PVP_MATCH
                         elif i == 2:
                             pass
                         elif i == 3:

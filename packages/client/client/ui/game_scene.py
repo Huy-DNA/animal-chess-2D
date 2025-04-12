@@ -6,7 +6,7 @@ from pygame.event import Event
 
 class GameSceneType(Enum):
     MENU = 0
-    MATCH = 1
+    OFFLINE_PVP_MATCH = 1
 
 
 class GameScene(ABC):

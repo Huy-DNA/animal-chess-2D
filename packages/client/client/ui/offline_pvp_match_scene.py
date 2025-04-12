@@ -21,7 +21,7 @@ from ui.constants import (
 from core.game import Game, Piece
 
 
-class MatchScene(GameScene):
+class OfflinePvPMatchScene(GameScene):
     animal_images: Dict[PieceType, Surface]
     background_image: Surface
     inner_background_image: Surface
@@ -42,7 +42,7 @@ class MatchScene(GameScene):
         self.screen = screen
         self.selected_piece = None
 
-        self.animal_images = MatchScene.load_animal_images()
+        self.animal_images = OfflinePvPMatchScene.load_animal_images()
         self.background_image = pygame.transform.scale(
             pygame.image.load(
                 os.path.join(ASSETS_PATH, "board-image.png")
@@ -236,4 +236,4 @@ class MatchScene(GameScene):
         return GameSceneType.MATCH
 
     def get_type(self) -> GameSceneType:
-        return GameSceneType.MATCH
+        return GameSceneType.OFFLINE_PVP_MATCH
