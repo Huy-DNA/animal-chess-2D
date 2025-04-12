@@ -1,19 +1,18 @@
-from typing import List, Optional
+from typing import List
 from pygame import Surface
 import pygame
 from pygame.event import Event
-from ui.game_scene import GameSceneType
+from ui.offline_cvp_match_scene import DifficultyMode, OfflineCvPMatchScene
 from ui.button import Button
-from ui.difficulty_menu_scene import DifficultyMenuScene
-from ui.offline_pvp_match_scene import OfflinePvPMatchScene
-from ui.game_scene import GameScene
+import ui.menu_scene
+from ui.game_scene import GameScene, GameSceneType
 from ui.constants import (
     SCREEN_WIDTH,
     SCREEN_HEIGHT,
 )
 
 
-class MenuScene(GameScene):
+class DifficultyMenuScene(GameScene):
     def __init__(self, screen: Surface):
         self.screen = screen
 
@@ -29,11 +28,10 @@ class MenuScene(GameScene):
         start_y = SCREEN_HEIGHT // 2 - 100
 
         buttons_info = [
-            "Computer vs Player",
-            "Player vs Player",
-            "Online",
-            "Instructions",
-            "Quit",
+            "Easy",
+            "Medium",
+            "Hard",
+            "Back",
         ]
 
         self.buttons = []
@@ -47,7 +45,7 @@ class MenuScene(GameScene):
     def get_type(self) -> GameSceneType:
         return GameSceneType.MENU
 
-    def step(self, events: List[Event]) -> Optional[GameScene]:
+    def step(self, events: List[Event]) -> GameSceneType:
         mouse_pos = pygame.mouse.get_pos()
 
         for button in self.buttons:
@@ -58,16 +56,19 @@ class MenuScene(GameScene):
                 for i, button in enumerate(self.buttons):
                     if button.is_clicked(mouse_pos):
                         if i == 0:
-                            return DifficultyMenuScene(self.screen)
+                            return OfflineCvPMatchScene(
+                                DifficultyMode.EASY, self.screen
+                            )
                         elif i == 1:
-                            return OfflinePvPMatchScene(self.screen)
+                            return OfflineCvPMatchScene(
+                                DifficultyMode.MEDIUM, self.screen
+                            )
                         elif i == 2:
-                            pass
+                            return OfflineCvPMatchScene(
+                                DifficultyMode.HARD, self.screen
+                            )
                         elif i == 3:
-                            pass
-                        elif i == 4:
-                            pygame.quit()
-                            exit()
+                            return ui.menu_scene.MenuScene(self.screen)
 
         self.draw()
 
@@ -76,7 +77,7 @@ class MenuScene(GameScene):
     def draw(self) -> None:
         self.screen.blit(self.background, (0, 0))
 
-        title_text = self.title_font.render("Animal Chess", True, (255, 255, 255))
+        title_text = self.title_font.render("Difficulty", True, (255, 255, 255))
         title_rect = title_text.get_rect(center=(SCREEN_WIDTH // 2, 150))
         self.screen.blit(title_text, title_rect)
 

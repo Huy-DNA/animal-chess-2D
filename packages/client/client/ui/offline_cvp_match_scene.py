@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Dict, List, Optional
 from core.map import Position
 from core.piece import Color, PieceType
@@ -21,7 +22,13 @@ from ui.constants import (
 from core.game import Game, Piece
 
 
-class OfflinePvPMatchScene(GameScene):
+class DifficultyMode(Enum):
+    EASY = 0
+    MEDIUM = 1
+    HARD = 2
+
+
+class OfflineCvPMatchScene(GameScene):
     animal_images: Dict[PieceType, Surface]
     background_image: Surface
     inner_background_image: Surface
@@ -35,14 +42,14 @@ class OfflinePvPMatchScene(GameScene):
     offset_x: int
     offset_y: int
 
-    def __init__(self, screen: Surface):
+    def __init__(self, mode: DifficultyMode, screen: Surface):
         pygame.display.set_caption("Animal chess")
         self.game = Game()
 
         self.screen = screen
         self.selected_piece = None
 
-        self.animal_images = OfflinePvPMatchScene.load_animal_images()
+        self.animal_images = OfflineCvPMatchScene.load_animal_images()
         self.background_image = pygame.transform.scale(
             pygame.image.load(
                 os.path.join(ASSETS_PATH, "board-image.png")
@@ -236,4 +243,4 @@ class OfflinePvPMatchScene(GameScene):
         return None
 
     def get_type(self) -> GameSceneType:
-        return GameSceneType.OFFLINE_PVP_MATCH
+        return GameSceneType.OFFLINE_CVP_MATCH

@@ -1,8 +1,7 @@
 import pygame
 from pygame.time import Clock
-from ui.offline_pvp_match_scene import OfflinePvPMatchScene
 from ui.menu_scene import MenuScene
-from ui.game_scene import GameScene, GameSceneType
+from ui.game_scene import GameScene
 from ui.constants import SCREEN_WIDTH, SCREEN_HEIGHT
 
 
@@ -19,13 +18,10 @@ class GameLoop:
         self.__running = False
         self.__fps = 60
         self.__clock = pygame.time.Clock()
-        self.__switch_scene(GameSceneType.MENU)
+        self.__switch_scene(MenuScene(self.__screen))
 
-    def __switch_scene(self, scene_type: GameSceneType):
-        if scene_type == GameSceneType.OFFLINE_PVP_MATCH:
-            self.__current_scene = OfflinePvPMatchScene(self.__screen)
-        elif scene_type == GameSceneType.MENU:
-            self.__current_scene = MenuScene(self.__screen)
+    def __switch_scene(self, scene: GameScene):
+        self.__current_scene = scene
 
     def run(self):
         self.__running = True
@@ -39,9 +35,9 @@ class GameLoop:
 
                 scene_events.append(event)
 
-            next_scene_type = self.__current_scene.step(scene_events)
-            if self.__current_scene.get_type() != next_scene_type:
-                self.__switch_scene(next_scene_type)
+            next_scene = self.__current_scene.step(scene_events)
+            if next_scene:
+                self.__switch_scene(next_scene)
             pygame.display.flip()
 
             self.__clock.tick(self.__fps)
