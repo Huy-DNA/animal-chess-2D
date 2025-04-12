@@ -69,6 +69,7 @@ class Game:
         if replaced_piece is not None:
             self.__state.kill_piece(replaced_piece)
         self.__state.set_piece_position(piece, position)
+        self.__state.next_turn()
         return replaced_piece or True
 
     def is_game_over(self) -> Optional[Color]:
@@ -84,3 +85,6 @@ class Game:
 
     def get_state(self) -> State:
         return self.__state
+
+    def get_turn(self) -> Color:
+        self.__state.get_turn()
