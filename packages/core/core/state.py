@@ -6,8 +6,9 @@ from core.piece import Color, Piece, PieceType
 class State:
     __map: Map
     __piece_positions: Dict[Piece, Optional[Position]]
+    __turn: Color
 
-    def __init__(self, map=DEFAULT_MAP):
+    def __init__(self, map=DEFAULT_MAP, turn=Color.RED):
         self.__map = map
         self.__piece_positions = {
             Piece(Color.RED, PieceType.ELEPHANT): Position(6, 2),
@@ -27,6 +28,7 @@ class State:
             Piece(Color.BLUE, PieceType.CAT): Position(1, 7),
             Piece(Color.BLUE, PieceType.MOUSE): Position(6, 6),
         }
+        self.__turn = turn
 
     @staticmethod
     def get_all_pieces() -> List[Piece]:
@@ -88,3 +90,9 @@ class State:
 
     def kill_piece(self, piece: Piece):
         self.__piece_positions[piece] = None
+
+    def get_turn(self) -> Color:
+        return self.__turn
+
+    def next_turn(self):
+        self.__turn = Color.BLUE if self.__turn == Color.RED else Color.RED

@@ -11,10 +11,32 @@ class PieceType(Enum):
     LION = 6
     ELEPHANT = 7
 
+    def to_string(self) -> str:
+        if self == PieceType.MOUSE:
+            return "mouse"
+        elif self == PieceType.CAT:
+            return "cat"
+        elif self == PieceType.WOLF:
+            return "wolf"
+        elif self == PieceType.DOG:
+            return "dog"
+        elif self == PieceType.LEOPARD:
+            return "leopard"
+        elif self == PieceType.TIGER:
+            return "tiger"
+        elif self == PieceType.LION:
+            return "lion"
+        elif self == PieceType.ELEPHANT:
+            return "elephant"
+        raise RuntimeError("Unreachable")
+
 
 class Color(Enum):
     RED = 0
     BLUE = 1
+
+    def to_string(self) -> str:
+        return "red" if self == Color.RED else "blue"
 
 
 @dataclass(frozen=True)
