@@ -1,8 +1,7 @@
 from PodSixNet.Connection import ConnectionListener, connection
 from PodSixNet.EndPoint import EndPoint
-from marshmallow_dataclass import class_schema
-from core.core.piece import Piece
-from core.core.map import Position
+from core.piece import Piece
+from core.map import Position
 from typing import Callable, Optional
 
 
@@ -14,7 +13,6 @@ class ServerConnector(ConnectionListener):
         super().__init__()
         self.__connection = connection
         connection.DoConnect((ip, port))
-        self.__callbacks = {}
         self.__match_found_callback = None
         self.__match_started_callback = None
         self.__opponent_ready_callback = None

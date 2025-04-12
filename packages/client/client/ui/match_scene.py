@@ -4,10 +4,11 @@ from core.piece import Color, PieceType
 import pygame
 import os
 import functools
+from pygame.event import Event
 from pygame.font import Font
 from pygame.surface import Surface
-from pygame.time import Clock
-from constants import (
+from ui.game_scene import GameScene, GameSceneType
+from ui.constants import (
     SCREEN_WIDTH,
     SCREEN_HEIGHT,
     TILE_SIZE,
@@ -20,14 +21,13 @@ from constants import (
 from core.game import Game, Piece
 
 
-class ClientGame:
+class MatchScene(GameScene):
     animal_images: Dict[PieceType, Surface]
     background_image: Surface
     inner_background_image: Surface
     trap_image: Surface
     cave_image: Surface
     font: Font
-    clock: Clock
 
     game: Game
     screen: Surface
@@ -35,17 +35,16 @@ class ClientGame:
     offset_x: int
     offset_y: int
 
-    def __init__(self):
+    def __init__(self, screen: Surface):
         pygame.display.set_caption("Animal chess")
         self.game = Game()
 
-        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
+        self.screen = screen
         self.selected_piece = None
         self.offset_x = 0
         self.offset_y = 0
 
-        self.animal_images = ClientGame.load_animal_images()
+        self.animal_images = MatchScene.load_animal_images()
         self.background_image = pygame.transform.scale(
             pygame.image.load(
                 os.path.join(ASSETS_PATH, "board-image.png")
@@ -69,8 +68,6 @@ class ClientGame:
         )
 
         self.font: Font = pygame.font.SysFont(None, 36)
-
-        self.clock: Clock = pygame.time.Clock()
 
     def get_board_mouse_pos(self, mouse_x: float, mouse_y: float) -> Optional[Position]:
         col = (mouse_x - BOARD_X) // TILE_SIZE
@@ -205,57 +202,41 @@ class ClientGame:
         )
         self.screen.blit(turn_text, (20, 20))
 
-    def run(self):
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
+    def step(self, mouse_event: Event) -> GameSceneType:
+        if mouse_event.type == pygame.MOUSEBUTTONDOWN:
+            pos = self.get_board_mouse_pos(*pygame.mouse.get_pos())
+            if pos is not None:
+                piece = self.game.get_state().get_piece_at_position(pos)
+                if piece and piece.color == self.game.get_turn():
+                    self.selected_piece = piece
+                    self.offset_x = pos.y - (BOARD_X + pos.x * TILE_SIZE)
+                    self.offset_y = pos.x - (BOARD_Y + pos.y * TILE_SIZE)
 
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    pos = self.get_board_mouse_pos(*pygame.mouse.get_pos())
-                    if pos is not None:
-                        piece = self.game.get_state().get_piece_at_position(pos)
-                        if piece and piece.color == self.game.get_turn():
-                            self.selected_piece = piece
-                            self.offset_x = pos.y - (BOARD_X + pos.x * TILE_SIZE)
-                            self.offset_y = pos.x - (BOARD_Y + pos.y * TILE_SIZE)
-
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    if self.selected_piece:
-                        mx, my = event.pos
-                        pos = self.get_board_mouse_pos(mx, my)
-                        if pos is not None:
-                            self.game.move(self.selected_piece, pos)
-                        self.selected_piece = None
-
-            self.draw_board()
-
+        elif mouse_event.type == pygame.MOUSEBUTTONUP:
             if self.selected_piece:
-                mx, my = pygame.mouse.get_pos()
-                img = self.animal_images[self.selected_piece.type]
-                pygame.draw.circle(
-                    self.screen, (255, 255, 255), (mx, my), TILE_SIZE // 2 - 4
-                )
-                img_rect = img.get_rect(center=(mx, my))
-                self.screen.blit(img, img_rect.topleft)
+                mx, my = mouse_event.pos
+                pos = self.get_board_mouse_pos(mx, my)
+                if pos is not None:
+                    self.game.move(self.selected_piece, pos)
+                self.selected_piece = None
 
-                team_color = (
-                    (255, 0, 0)
-                    if self.selected_piece.color == Color.RED
-                    else (0, 0, 255)
-                )
-                pygame.draw.circle(
-                    self.screen, team_color, (mx, my), TILE_SIZE // 2 - 4, 4
-                )
+        self.draw_board()
 
-            pygame.display.flip()
-            self.clock.tick(60)
+        if self.selected_piece:
+            mx, my = pygame.mouse.get_pos()
+            img = self.animal_images[self.selected_piece.type]
+            pygame.draw.circle(
+                self.screen, (255, 255, 255), (mx, my), TILE_SIZE // 2 - 4
+            )
+            img_rect = img.get_rect(center=(mx, my))
+            self.screen.blit(img, img_rect.topleft)
 
-        pygame.quit()
+            team_color = (
+                (255, 0, 0) if self.selected_piece.color == Color.RED else (0, 0, 255)
+            )
+            pygame.draw.circle(self.screen, team_color, (mx, my), TILE_SIZE // 2 - 4, 4)
 
+        return GameSceneType.MATCH
 
-if __name__ == "__main__":
-    pygame.init()
-    game = ClientGame()
-    game.run()
+    def get_type(self) -> GameSceneType:
+        return GameSceneType.MATCH
