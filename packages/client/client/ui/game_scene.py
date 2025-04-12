@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from enum import Enum
+from typing import List
 from pygame.event import Event
 
 
@@ -10,7 +11,7 @@ class GameSceneType(Enum):
 
 class GameScene(ABC):
     @abstractmethod
-    def step(self, mouse_event: Event) -> GameSceneType:
+    def step(self, events: List[Event]) -> GameSceneType:
         pass
 
     @abstractmethod

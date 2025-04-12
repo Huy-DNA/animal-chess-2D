@@ -29,28 +29,17 @@ class GameLoop:
         self.__running = True
 
         while self.__running:
+            scene_events = []
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.__running = False
                     break
 
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        self.__running = False
-                        break
+                scene_events.append(event)
 
-                if event.type in (
-                    pygame.MOUSEBUTTONDOWN,
-                    pygame.MOUSEBUTTONUP,
-                    pygame.MOUSEMOTION,
-                ):
-                    next_scene_type = self.__current_scene.step(event)
-                    if self.__current_scene.get_type() != next_scene_type:
-                        self.__switch_scene(next_scene_type)
-
-            if not pygame.event.get():
-                self.__current_scene.step(Event(0))
-
+            next_scene_type = self.__current_scene.step(scene_events)
+            if self.__current_scene.get_type() != next_scene_type:
+                self.__switch_scene(next_scene_type)
             pygame.display.flip()
 
             self.__clock.tick(self.__fps)
