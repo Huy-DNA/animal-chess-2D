@@ -96,15 +96,45 @@ class ClientGame:
 
     @functools.cache
     def rivers(self) -> List[Position]:
-        return []
+        state = self.game.get_state()
+        map = state.get_map()
+
+        river_positions = []
+        for y in range(map.height()):
+            for x in range(map.width()):
+                location = map[y, x]
+                if location and location.is_river:
+                    river_positions.append(Position(x, y))
+
+        return river_positions
 
     @functools.cache
     def caves(self) -> List[Position]:
-        return []
+        state = self.game.get_state()
+        map = state.get_map()
+
+        cave_positions = []
+        for y in range(map.height()):
+            for x in range(map.width()):
+                location = map[y, x]
+                if location and location.cave_color is not None:
+                    cave_positions.append(Position(x, y))
+
+        return cave_positions
 
     @functools.cache
     def traps(self) -> List[Position]:
-        return []
+        state = self.game.get_state()
+        map = state.get_map()
+
+        trap_positions = []
+        for y in range(map.height()):
+            for x in range(map.width()):
+                location = map[y, x]
+                if location and location.trap_color is not None:
+                    trap_positions.append(Position(x, y))
+
+        return trap_positions
 
     def draw_board(self):
         self.screen.blit(ClientGame.INNER_BACKGROUND_IMAGE, (0, 0))
