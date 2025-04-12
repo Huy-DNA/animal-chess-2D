@@ -4,7 +4,10 @@ import math
 import copy
 import pickle
 import os
-from typing import List, Optional, Dict, Any
+from typing import List, Optional
+
+from core.game import Game
+from ai.ai import AI
 from move import Move
 from core.piece import Color
 
@@ -55,7 +58,7 @@ class MCTSNode:
         self.wins += result
 
 
-class MCTSAI:
+class MCTSAI(AI):
     def __init__(
         self,
         color: Color,
@@ -74,7 +77,7 @@ class MCTSAI:
         if checkpoint_path and os.path.exists(checkpoint_path):
             self.load_checkpoint(checkpoint_path)
 
-    def choose_move(self, game) -> Optional[Move]:
+    def choose_move(self, game: Game) -> Optional[Move]:
         start_time = time.time()
 
         if self.tree_root is None or not self._is_state_compatible(
@@ -257,25 +260,3 @@ class MCTSAI:
         except Exception as e:
             print(f"Error loading checkpoint: {e}")
             self.tree_root = None
-
-
-def create_or_load_mcts_ai(
-    color: Color,
-    num_simulations=1000,
-    simulation_depth=50,
-    checkpoint_path: Optional[str] = None,
-) -> MCTSAI:
-    return MCTSAI(
-        color=color,
-        num_simulations=num_simulations,
-        simulation_depth=simulation_depth,
-        checkpoint_path=checkpoint_path,
-    )
-
-
-def play_with_mcts_ai(game, ai: MCTSAI):
-    move = ai.choose_move(game)
-    if move:
-        game.move(move.piece, move.to_pos)
-        return True
-    return False

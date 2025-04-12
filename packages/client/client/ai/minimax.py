@@ -1,11 +1,15 @@
 import time
 from typing import List, Optional
+
+from core.game import Game
+
+from ai.ai import AI
 from move import Move
 from core.piece import Color, PieceType
 import copy
 
 
-class MinimaxAI:
+class MinimaxAI(AI):
     def __init__(self, color: Color, max_depth: int = 3):
         self.color = color
         self.max_depth = max_depth
@@ -25,7 +29,7 @@ class MinimaxAI:
         self.den_distance_weight = 3
         self.center_control_weight = 1
 
-    def choose_move(self, game) -> Optional[Move]:
+    def choose_move(self, game: Game) -> Optional[Move]:
         self.nodes_evaluated = 0
         start_time = time.time()
 
@@ -38,7 +42,6 @@ class MinimaxAI:
 
         for move in all_moves:
             game_copy = copy.deepcopy(game)
-            captured = game_copy.move(move.piece, move.to_pos)
 
             score = self._minimax(
                 game_copy, self.max_depth - 1, False, float("-inf"), float("inf")
@@ -57,7 +60,7 @@ class MinimaxAI:
         return best_move
 
     def _minimax(
-        self, game, depth: int, is_maximizing: bool, alpha: float, beta: float
+        self, game: Game, depth: int, is_maximizing: bool, alpha: float, beta: float
     ) -> float:
         self.nodes_evaluated += 1
 
@@ -101,7 +104,7 @@ class MinimaxAI:
 
             return min_eval
 
-    def _get_all_possible_moves(self, game, color: Color) -> List[Move]:
+    def _get_all_possible_moves(self, game: Game, color: Color) -> List[Move]:
         moves = []
         state = game.get_state()
 
@@ -113,7 +116,7 @@ class MinimaxAI:
 
         return moves
 
-    def _evaluate_board(self, game) -> float:
+    def _evaluate_board(self, game: Game) -> float:
         state = game.get_state()
         score = 0
 
@@ -140,15 +143,3 @@ class MinimaxAI:
                 score -= value
 
         return score
-
-
-def create_or_load_minimax_ai(color: Color, max_depth: int = 3) -> MinimaxAI:
-    return MinimaxAI(color=color, max_depth=max_depth)
-
-
-def play_with_minimax_ai(game, ai: MinimaxAI):
-    move = ai.choose_move(game)
-    if move:
-        game.move(move.piece, move.to_pos)
-        return True
-    return False

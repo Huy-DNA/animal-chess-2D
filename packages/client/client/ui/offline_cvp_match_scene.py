@@ -8,6 +8,7 @@ import functools
 from pygame.event import Event
 from pygame.font import Font
 from pygame.surface import Surface
+from ai.ai import AI
 from ui.game_scene import GameScene, GameSceneType
 from ui.constants import (
     SCREEN_WIDTH,
@@ -41,6 +42,7 @@ class OfflineCvPMatchScene(GameScene):
     selected_piece: Optional[Piece]
     offset_x: int
     offset_y: int
+    ai: AI
 
     def __init__(self, mode: DifficultyMode, screen: Surface):
         pygame.display.set_caption("Animal chess")
