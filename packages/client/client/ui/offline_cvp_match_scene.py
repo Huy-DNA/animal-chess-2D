@@ -230,6 +230,10 @@ class OfflineCvPMatchScene(GameScene):
         self.screen.blit(turn_text, (20, 20))
 
     def step(self, events: List[Event]) -> GameSceneType:
+        if self.game.get_turn() == Color.BLUE:
+            self.ai.play_with_ai(self.game)
+            return None
+
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = self.get_board_mouse_pos(*pygame.mouse.get_pos())

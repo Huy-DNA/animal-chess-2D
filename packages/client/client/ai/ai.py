@@ -10,6 +10,7 @@ class AI(ABC):
 
     def play_with_ai(self, game: Game):
         move = self.choose_move(game)
+        print(move)
         if move:
             game.move(move.piece, move.to_pos)
             return True
