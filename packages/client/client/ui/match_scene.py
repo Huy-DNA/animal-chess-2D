@@ -55,17 +55,17 @@ class MatchScene(GameScene):
             (SCREEN_WIDTH, SCREEN_HEIGHT),
         )
 
-        self.trap_image: Surface = pygame.transform.scale(
+        self.trap_image = pygame.transform.scale(
             pygame.image.load(os.path.join(ASSETS_PATH, "trap-image.png")),
             (TILE_SIZE, TILE_SIZE),
         )
 
-        self.cave_image: Surface = pygame.transform.scale(
+        self.cave_image = pygame.transform.scale(
             pygame.image.load(os.path.join(ASSETS_PATH, "cave-image.png")),
             (TILE_SIZE, TILE_SIZE),
         )
 
-        self.font: Font = pygame.font.SysFont(None, 36)
+        self.font = pygame.font.SysFont(None, 36)
 
     def get_board_mouse_pos(self, mouse_x: float, mouse_y: float) -> Optional[Position]:
         row = (mouse_x - BOARD_X) // TILE_SIZE

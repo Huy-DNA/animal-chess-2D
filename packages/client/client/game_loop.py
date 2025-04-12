@@ -1,7 +1,7 @@
 import pygame
-from pygame.event import Event
 from pygame.time import Clock
 from ui.match_scene import MatchScene
+from ui.menu_scene import MenuScene
 from ui.game_scene import GameScene, GameSceneType
 from ui.constants import SCREEN_WIDTH, SCREEN_HEIGHT
 
@@ -19,11 +19,13 @@ class GameLoop:
         self.__running = False
         self.__fps = 60
         self.__clock = pygame.time.Clock()
-        self.__switch_scene(GameSceneType.MATCH)
+        self.__switch_scene(GameSceneType.MENU)
 
     def __switch_scene(self, scene_type: GameSceneType):
         if scene_type == GameSceneType.MATCH:
             self.__current_scene = MatchScene(self.__screen)
+        elif scene_type == GameSceneType.MENU:
+            self.__current_scene = MenuScene(self.__screen)
 
     def run(self):
         self.__running = True
