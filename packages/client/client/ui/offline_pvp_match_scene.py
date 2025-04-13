@@ -7,7 +7,7 @@ import functools
 from pygame.event import Event
 from pygame.font import Font
 from pygame.surface import Surface
-from ui.game_scene import GameScene, GameSceneType
+from ui.game_scene import GameScene
 from ui.constants import (
     SCREEN_WIDTH,
     SCREEN_HEIGHT,
@@ -200,7 +200,7 @@ class OfflinePvPMatchScene(GameScene):
         )
         self.screen.blit(turn_text, (20, 20))
 
-    def step(self, events: List[Event]) -> GameSceneType:
+    def step(self, events: List[Event]) -> GameScene:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = self.get_board_mouse_pos(*pygame.mouse.get_pos())
@@ -234,6 +234,3 @@ class OfflinePvPMatchScene(GameScene):
             pygame.draw.circle(self.screen, team_color, (mx, my), TILE_SIZE // 2 - 4, 4)
 
         return None
-
-    def get_type(self) -> GameSceneType:
-        return GameSceneType.OFFLINE_PVP_MATCH

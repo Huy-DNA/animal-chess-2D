@@ -5,7 +5,7 @@ from pygame.event import Event
 from ui.offline_cvp_match_scene import DifficultyMode, OfflineCvPMatchScene
 from ui.button import Button
 import ui.menu_scene
-from ui.game_scene import GameScene, GameSceneType
+from ui.game_scene import GameScene
 from ui.constants import (
     SCREEN_WIDTH,
     SCREEN_HEIGHT,
@@ -42,10 +42,7 @@ class DifficultyMenuScene(GameScene):
                 Button(x, y, button_width, button_height, text, self.button_font)
             )
 
-    def get_type(self) -> GameSceneType:
-        return GameSceneType.MENU
-
-    def step(self, events: List[Event]) -> GameSceneType:
+    def step(self, events: List[Event]) -> GameScene:
         mouse_pos = pygame.mouse.get_pos()
 
         for button in self.buttons:

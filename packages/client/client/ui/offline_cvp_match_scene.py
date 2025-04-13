@@ -13,7 +13,7 @@ from ai.ai import AI
 from ai.mcts import MCTSAI
 from ai import mcts
 from ai.minimax import MinimaxAI
-from ui.game_scene import GameScene, GameSceneType
+from ui.game_scene import GameScene
 from ui.constants import (
     SCREEN_WIDTH,
     SCREEN_HEIGHT,
@@ -229,7 +229,7 @@ class OfflineCvPMatchScene(GameScene):
         )
         self.screen.blit(turn_text, (20, 20))
 
-    def step(self, events: List[Event]) -> GameSceneType:
+    def step(self, events: List[Event]) -> GameScene:
         if self.game.get_turn() == Color.BLUE:
             self.ai.play_with_ai(self.game)
             return None
@@ -267,6 +267,3 @@ class OfflineCvPMatchScene(GameScene):
             pygame.draw.circle(self.screen, team_color, (mx, my), TILE_SIZE // 2 - 4, 4)
 
         return None
-
-    def get_type(self) -> GameSceneType:
-        return GameSceneType.OFFLINE_CVP_MATCH

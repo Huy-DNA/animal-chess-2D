@@ -2,7 +2,6 @@ from typing import List, Optional
 from pygame import Surface
 import pygame
 from pygame.event import Event
-from ui.game_scene import GameSceneType
 from ui.button import Button
 from ui.difficulty_menu_scene import DifficultyMenuScene
 from ui.offline_pvp_match_scene import OfflinePvPMatchScene
@@ -43,9 +42,6 @@ class MenuScene(GameScene):
             self.buttons.append(
                 Button(x, y, button_width, button_height, text, self.button_font)
             )
-
-    def get_type(self) -> GameSceneType:
-        return GameSceneType.MENU
 
     def step(self, events: List[Event]) -> Optional[GameScene]:
         mouse_pos = pygame.mouse.get_pos()
