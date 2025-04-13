@@ -68,10 +68,10 @@ class OfflinePvPMatchScene(GameScene):
         self.font = pygame.font.SysFont(None, 36)
 
     def get_board_mouse_pos(self, mouse_x: float, mouse_y: float) -> Optional[Position]:
-        row = (mouse_x - BOARD_X) // TILE_SIZE
-        col = (mouse_y - BOARD_Y) // TILE_SIZE
+        col = (mouse_x - BOARD_X) // TILE_SIZE
+        row = (mouse_y - BOARD_Y) // TILE_SIZE
         if 0 <= col < BOARD_COLS and 0 <= row < BOARD_ROWS:
-            return Position(row, col)
+            return Position(col, row)
         return None
 
     @functools.cache

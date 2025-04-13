@@ -34,7 +34,8 @@ class Game:
         not_blocked_by_other_pieces_cells = []
         for cell in standable_cells:
             adj_loc = cell.location
-            adj_piece = self.__state.get_piece_at_position(cell)
+            adj_pos = cell.position
+            adj_piece = self.__state.get_piece_at_position(adj_pos)
 
             if adj_piece is None:
                 not_blocked_by_other_pieces_cells.append(cell)
@@ -43,8 +44,6 @@ class Game:
                 continue
             elif cell.location.trap_color == piece.color:
                 not_blocked_by_other_pieces_cells.append(cell)
-                continue
-            elif cell.location.trap_color != piece.color:
                 continue
             elif piece.type == PieceType.MOUSE and adj_piece.type == PieceType.ELEPHANT:
                 not_blocked_by_other_pieces_cells.append(cell)
@@ -61,7 +60,7 @@ class Game:
         if self.is_game_over():
             return False
 
-        possible_pos = map(lambda x: x.position, self.get_possible_moves(piece))
+        possible_pos = list(map(lambda x: x.position, self.get_possible_moves(piece)))
         if position not in possible_pos:
             return False
 
