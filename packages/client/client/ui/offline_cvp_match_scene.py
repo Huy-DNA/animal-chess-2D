@@ -84,9 +84,9 @@ class OfflineCvPMatchScene(GameScene):
         self.font = pygame.font.SysFont(None, 36)
 
         if mode == DifficultyMode.EASY:
-            self.ai = MinimaxAI(Color.BLUE, 1)
-        elif mode == DifficultyMode.MEDIUM:
             self.ai = MinimaxAI(Color.BLUE, 2)
+        elif mode == DifficultyMode.MEDIUM:
+            self.ai = MinimaxAI(Color.BLUE, 4)
         else:
             self.ai = MCTSAI(
                 Color.BLUE,

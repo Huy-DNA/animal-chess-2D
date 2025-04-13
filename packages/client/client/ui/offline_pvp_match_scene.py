@@ -215,7 +215,7 @@ class OfflinePvPMatchScene(GameScene):
                     pos = self.get_board_mouse_pos(mx, my)
                     if pos is not None:
                         self.game.move(self.selected_piece, pos)
-                    self.selected_piece = None
+                self.selected_piece = None
 
         self.draw_board()
 
