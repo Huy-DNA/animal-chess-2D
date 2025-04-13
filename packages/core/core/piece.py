@@ -1,6 +1,7 @@
 from marshmallow_dataclass import dataclass
 from enum import Enum
 
+
 class PieceType(Enum):
     MOUSE = 0
     CAT = 1
@@ -30,6 +31,25 @@ class PieceType(Enum):
             return "elephant"
         raise RuntimeError("Unreachable")
 
+    def __ge__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value >= other.value
+        return NotImplemented
+
+    def __gt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value > other.value
+        return NotImplemented
+
+    def __le__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value <= other.value
+        return NotImplemented
+
+    def __lt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value < other.value
+        return NotImplemented
 
 class Color(Enum):
     RED = 0
