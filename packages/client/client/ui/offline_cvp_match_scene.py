@@ -86,7 +86,7 @@ class OfflineCvPMatchScene(GameScene):
         if mode == DifficultyMode.EASY:
             self.ai = MinimaxAI(Color.BLUE, 2)
         elif mode == DifficultyMode.MEDIUM:
-            self.ai = MinimaxAI(Color.BLUE, 4)
+            self.ai = MinimaxAI(Color.BLUE, 3)
         else:
             self.ai = MCTSAI(
                 Color.BLUE,
