@@ -103,8 +103,8 @@ class OfflineCvPMatchScene(GameScene):
             return Position(col, row)
         return None
 
-    @functools.cache
     @staticmethod
+    @functools.cache
     def load_animal_images():
         images = {}
         name_to_type = {

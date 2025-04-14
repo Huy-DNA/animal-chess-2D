@@ -1,3 +1,4 @@
+from core.game import Game
 from core.piece import Piece
 from core.map import Position
 from typing import Any, Dict, Optional, Set
@@ -33,7 +34,7 @@ class ClientChannel(Channel):
             self.Send({"action": "error", "message": "Match not found"})
             return
 
-        success = match.move(self.addr, piece, pos)
+        success = match.game.move(piece, pos)
         if not success:
             self.Send({"action": "error", "message": "Invalid move"})
             return
@@ -305,7 +306,8 @@ class GameServer(Server):
             pending_match = self.__pending_matches[match_id]
             players = pending_match["players"]
 
-            mat = match.Match(match_id, players)
+            print(players)
+            mat = match.Match(match_id, Game(), *players)
 
             self.__matches[match_id] = mat
 

@@ -10,3 +10,6 @@ class Match:
     red_player: Addr
     blue_player: Addr
     turn: Color = Color.RED
+
+    def get_players(self) -> Addr:
+        return [self.red_player, self.blue_player]
