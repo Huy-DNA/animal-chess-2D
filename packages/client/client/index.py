@@ -1,4 +1,3 @@
-import os
 from game_loop import GameLoop
 
 game_loop = GameLoop()
