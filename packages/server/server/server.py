@@ -1,13 +1,12 @@
 from core.piece import Piece
 from core.map import Position
-from typing import Any, Dict, Tuple, Optional, Set
+from typing import Any, Dict, Optional, Set
 from PodSixNet.Channel import Channel
 from PodSixNet.Server import Server
 from queue import Queue
-from match import Match, MatchId
 import uuid
-
-Addr = Tuple[str, int]
+import match
+from server_types import Addr, MatchId
 
 
 class ClientChannel(Channel):
@@ -165,7 +164,7 @@ class ClientChannel(Channel):
 class GameServer(Server):
     channelClass = ClientChannel
     __registered_clients: Dict[Addr, ClientChannel]
-    __matches: Dict[MatchId, Match]
+    __matches: Dict[MatchId, match.Match]
     __client_matches: Dict[Addr, MatchId]
     __pending_clients: Queue[Addr]
     __pending_clients_list: Set[Addr]
@@ -196,7 +195,7 @@ class GameServer(Server):
     def get_registered_clients(self) -> Dict[Addr, ClientChannel]:
         return self.__registered_clients
 
-    def get_matches(self) -> Dict[MatchId, Match]:
+    def get_matches(self) -> Dict[MatchId, match.Match]:
         return self.__matches
 
     def get_client_matches(self) -> Dict[Addr, MatchId]:
@@ -306,9 +305,9 @@ class GameServer(Server):
             pending_match = self.__pending_matches[match_id]
             players = pending_match["players"]
 
-            match = Match(match_id, players)
+            mat = match.Match(match_id, players)
 
-            self.__matches[match_id] = match
+            self.__matches[match_id] = mat
 
             for player in players:
                 self.__client_matches[player] = match_id
@@ -324,7 +323,6 @@ class GameServer(Server):
             print(f"Match started: {match_id}")
 
     def cancel_pending_match(self, match_id: MatchId, initiator: Addr) -> bool:
-        """Cancel a pending match"""
         if match_id in self.__pending_matches:
             pending_match = self.__pending_matches[match_id]
 
@@ -346,7 +344,6 @@ class GameServer(Server):
         return False
 
     def handle_disconnect_pending_matches(self, addr: Addr) -> None:
-        """Handle disconnection for pending matches"""
         matches_to_cancel = []
 
         for match_id, pending_match in self.__pending_matches.items():

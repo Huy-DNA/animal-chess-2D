@@ -1,9 +1,7 @@
 from core.game import Game
 from core.map import Color, dataclass
+from server_types import MatchId, Addr
 
-from server import Addr
-
-MatchId = str
 
 @dataclass
 class Match:

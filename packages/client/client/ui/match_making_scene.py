@@ -10,7 +10,6 @@ from ui.constants import (
 )
 from controller.network import ServerConnector
 from time import time
-
 from ui.online_pvp_match_scene import OnlinePvPMatchScene
 
 
