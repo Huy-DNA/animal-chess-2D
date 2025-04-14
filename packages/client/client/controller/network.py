@@ -1,6 +1,6 @@
 from PodSixNet.Connection import ConnectionListener, connection
 from PodSixNet.EndPoint import EndPoint
-from core.piece import Piece
+from core.piece import Color, Piece
 from core.map import Position
 from typing import Callable, Optional
 
@@ -9,6 +9,7 @@ class ServerConnector(ConnectionListener):
     __connection: EndPoint
 
     __move_made_callback: Optional[Callable[[Piece, Position, str], None]]
+
     def __init__(self, *, ip: str, port: int):
         super().__init__()
         self.__connection = connection
@@ -23,7 +24,7 @@ class ServerConnector(ConnectionListener):
         self.__error_callback = None
         self.__queued_callback = None
         self.__queue_cancelled_callback = None
-        self.__ready_confirmed_callback = None        
+        self.__ready_confirmed_callback = None
 
     def Network_error(self, data):
         if self.__error_callback:
@@ -60,7 +61,9 @@ class ServerConnector(ConnectionListener):
     def Network_match_started(self, data):
         if self.__match_started_callback:
             match_id = data.get("match_id")
-            self.__match_started_callback(match_id)
+            color = data.get("color")
+            color = Color.RED if color == "red" else Color.BLUE
+            self.__match_started_callback(match_id, color)
 
     def Network_match_cancelled(self, data):
         if self.__match_cancelled_callback:
@@ -78,7 +81,7 @@ class ServerConnector(ConnectionListener):
                 if self.__error_callback:
                     self.__error_callback("Missing move data from server.")
                 return
-            piece = Piece.Schema().load(piece_data)            
+            piece = Piece.Schema().load(piece_data)
             position = Position.Schema().load(position_data)
 
             self.__move_made_callback(piece, position, player)
@@ -141,7 +144,7 @@ class ServerConnector(ConnectionListener):
     def set_opponent_ready_callback(self, callback: Callable[[str], None]):
         self.__opponent_ready_callback = callback
 
-    def set_match_started_callback(self, callback: Callable[[str], None]):
+    def set_match_started_callback(self, callback: Callable[[str, Color], None]):
         self.__match_started_callback = callback
 
     def set_match_cancelled_callback(self, callback: Callable[[str, str], None]):

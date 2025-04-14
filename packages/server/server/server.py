@@ -1,5 +1,5 @@
 from core.game import Game
-from core.piece import Piece
+from core.piece import Color, Piece
 from core.map import Position
 from typing import Any, Dict, Optional, Set
 from PodSixNet.Channel import Channel
@@ -306,7 +306,6 @@ class GameServer(Server):
             pending_match = self.__pending_matches[match_id]
             players = pending_match["players"]
 
-            print(players)
             mat = match.Match(match_id, Game(), *players)
 
             self.__matches[match_id] = mat
@@ -317,7 +316,13 @@ class GameServer(Server):
             for player in players:
                 if player in self.__registered_clients:
                     self.__registered_clients[player].Send(
-                        {"action": "match_started", "match_id": str(match_id)}
+                        {
+                            "action": "match_started",
+                            "match_id": str(match_id),
+                            "color": Color.RED.to_string()
+                            if player == mat.red_player
+                            else Color.BLUE.to_string(),
+                        }
                     )
 
             self.__pending_matches.pop(match_id)

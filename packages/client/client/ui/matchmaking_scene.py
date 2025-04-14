@@ -11,6 +11,7 @@ from ui.constants import (
 from controller.network import ServerConnector
 from time import time
 from ui.online_pvp_match_scene import OnlinePvPMatchScene
+from core.piece import Color
 
 
 class MatchmakingScene(GameScene):
@@ -83,7 +84,7 @@ class MatchmakingScene(GameScene):
         elif self.state == "ready":
             self.message = "Both players ready. Starting game..."
 
-    def on_match_started(self, match_id: str):
+    def on_match_started(self, match_id: str, color: Color):
         self.message = "Match starting..."
         self.next_scene = OnlinePvPMatchScene(
             self.screen, self.connector, self.match_id, self.opponent
