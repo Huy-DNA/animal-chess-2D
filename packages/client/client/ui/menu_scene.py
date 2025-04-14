@@ -1,4 +1,6 @@
+import os
 from typing import List, Optional
+from dotenv import load_dotenv
 from pygame import Surface
 import pygame
 from pygame.event import Event
@@ -12,6 +14,9 @@ from ui.constants import (
 )
 from ui.matchmaking_scene import MatchmakingScene
 from controller.network import ServerConnector
+
+
+load_dotenv()
 
 
 class MenuScene(GameScene):
@@ -53,7 +58,9 @@ class MenuScene(GameScene):
                         elif i == 1:
                             return OfflinePvPMatchScene(self.screen)
                         elif i == 2:
-                            connector = ServerConnector()
+                            ip = os.getenv("SERVER_ADDRESS") or "0.0.0.0"
+                            port = int(os.getenv("SERVER_PORT") or "8686")
+                            connector = ServerConnector(ip=ip, port=port)
                             connector.Connect()
                             return MatchmakingScene(self.screen, connector)
                         elif i == 3:
