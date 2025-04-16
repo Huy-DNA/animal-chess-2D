@@ -92,6 +92,9 @@ class ServerConnector(ConnectionListener):
             reason = data.get("reason")
             self.__game_over_callback(winner, reason)
 
+    def Disconnect(self):
+        self.__connection.Close()
+
     def Send(self, data):
         self.__connection.Send(data)
 
