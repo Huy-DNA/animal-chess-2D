@@ -35,10 +35,12 @@ class OfflinePvPMatchScene(GameScene):
     selected_piece: Optional[Piece]
     offset_x: int
     offset_y: int
+    game_over: bool
     status_message: str
 
     def __init__(self, screen: Surface):
         pygame.display.set_caption("Animal chess")
+        self.game_over = False
         self.game = Game()
 
         self.screen = screen
@@ -229,26 +231,23 @@ class OfflinePvPMatchScene(GameScene):
 
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                # Check if any buttons were clicked
                 if self.quit_button.is_clicked(mouse_pos):
-                    self.connector.Disconnect()
                     pygame.quit()
                     exit()
 
                 elif self.menu_button.is_clicked(mouse_pos):
                     from ui.menu_scene import MenuScene
 
-                    self.connector.Disconnect()
                     return MenuScene(self.screen)
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if not self.game_over and event.type == pygame.MOUSEBUTTONDOWN:
                 pos = self.get_board_mouse_pos(*pygame.mouse.get_pos())
                 if pos is not None:
                     piece = self.game.get_state().get_piece_at_position(pos)
                     if piece and piece.color == self.game.get_turn():
                         self.selected_piece = piece
 
-            elif event.type == pygame.MOUSEBUTTONUP:
+            elif not self.game_over and event.type == pygame.MOUSEBUTTONUP:
                 if self.selected_piece:
                     mx, my = event.pos
                     pos = self.get_board_mouse_pos(mx, my)
@@ -259,7 +258,7 @@ class OfflinePvPMatchScene(GameScene):
         winner = self.game.is_game_over()
         if winner is not None:
             self.status_message = f"{winner.to_string()} won! Game over."
-            return None
+            self.game_over = True
         self.draw_board()
 
         if self.selected_piece:
