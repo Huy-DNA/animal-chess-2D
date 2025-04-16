@@ -1,4 +1,5 @@
 from typing import List, Optional
+from core.piece import Color
 import pygame
 from pygame.event import Event
 from pygame.font import Font
@@ -101,10 +102,10 @@ class MatchmakingScene(GameScene):
         elif self.state == "ready":
             self.message = "Both players ready. Starting game..."
 
-    def on_match_started(self, match_id: str):
+    def on_match_started(self, match_id: str, color: Color):
         self.message = "Match starting..."
         self.next_scene = OnlinePvPMatchScene(
-            self.screen, self.connector, self.match_id, self.opponent
+            self.screen, self.connector, match_id, self.opponent, color,
         )
 
     def on_match_cancelled(self, match_id: str, reason: str):
