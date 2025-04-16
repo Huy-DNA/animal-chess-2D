@@ -51,6 +51,7 @@ class OfflineCvPMatchScene(GameScene):
     offset_x: int
     offset_y: int
     ai: AI
+    status_message: str
 
     def __init__(self, mode: DifficultyMode, screen: Surface):
         pygame.display.set_caption("Animal chess")
@@ -109,6 +110,7 @@ class OfflineCvPMatchScene(GameScene):
                 exploration_constant=1.41,
                 checkpoint_path=os.path.join(CHECKPOINT_PATH, "mcts.pkl"),
             )
+        self.status_message = ''
 
     def get_board_mouse_pos(self, mouse_x: float, mouse_y: float) -> Optional[Position]:
         col = (mouse_x - BOARD_X) // TILE_SIZE
@@ -246,6 +248,9 @@ class OfflineCvPMatchScene(GameScene):
         self.quit_button.draw(self.screen)
         self.menu_button.draw(self.screen)
 
+        status_text = self.small_font.render(self.status_message, True, (0, 0, 0))
+        self.screen.blit(status_text, (20, SCREEN_HEIGHT - 30))
+
     def step(self, events: List[Event]) -> GameScene:
         if self.game.get_turn() == Color.BLUE:
             self.ai.play_with_ai(self.game)
@@ -283,6 +288,11 @@ class OfflineCvPMatchScene(GameScene):
                     if pos is not None:
                         self.game.move(self.selected_piece, pos)
                     self.selected_piece = None
+
+        winner = self.game.is_game_over()
+        if winner is not None:
+            self.status_message = f"{winner.to_string()} won! Game over."
+            return None
 
         self.draw_board()
 

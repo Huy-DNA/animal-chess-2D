@@ -35,6 +35,7 @@ class OfflinePvPMatchScene(GameScene):
     selected_piece: Optional[Piece]
     offset_x: int
     offset_y: int
+    status_message: str
 
     def __init__(self, screen: Surface):
         pygame.display.set_caption("Animal chess")
@@ -80,6 +81,7 @@ class OfflinePvPMatchScene(GameScene):
         )
         self.menu_button.normal_color = (70, 70, 200)
         self.menu_button.hover_color = (100, 100, 255)
+        self.status_message = ''
 
     def get_board_mouse_pos(self, mouse_x: float, mouse_y: float) -> Optional[Position]:
         col = (mouse_x - BOARD_X) // TILE_SIZE
@@ -217,6 +219,9 @@ class OfflinePvPMatchScene(GameScene):
         self.quit_button.draw(self.screen)
         self.menu_button.draw(self.screen)
 
+        status_text = self.small_font.render(self.status_message, True, (0, 0, 0))
+        self.screen.blit(status_text, (20, SCREEN_HEIGHT - 30))
+
     def step(self, events: List[Event]) -> GameScene:
         mouse_pos = pygame.mouse.get_pos()
         self.quit_button.update(mouse_pos)
@@ -251,6 +256,10 @@ class OfflinePvPMatchScene(GameScene):
                         self.game.move(self.selected_piece, pos)
                 self.selected_piece = None
 
+        winner = self.game.is_game_over()
+        if winner is not None:
+            self.status_message = f"{winner.to_string()} won! Game over."
+            return None
         self.draw_board()
 
         if self.selected_piece:
