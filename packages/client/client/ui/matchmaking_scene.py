@@ -4,14 +4,15 @@ from pygame.event import Event
 from pygame.font import Font
 from pygame.surface import Surface
 from ui.game_scene import GameScene
+from ui.button import Button
 from ui.constants import (
     SCREEN_WIDTH,
     SCREEN_HEIGHT,
 )
 from controller.network import ServerConnector
 from time import time
+
 from ui.online_pvp_match_scene import OnlinePvPMatchScene
-from core.piece import Color
 
 
 class MatchmakingScene(GameScene):
@@ -25,6 +26,8 @@ class MatchmakingScene(GameScene):
     opponent: Optional[str]
     opponent_ready: bool
     start_time: float
+    quit_button: Button
+    menu_button: Button
 
     def __init__(self, screen: Surface, connector: ServerConnector):
         pygame.display.set_caption("Animal Chess - Matchmaking")
@@ -38,6 +41,20 @@ class MatchmakingScene(GameScene):
         self.opponent = None
         self.opponent_ready = False
         self.start_time = time()
+
+        # Create the quit button
+        self.quit_button = Button(
+            SCREEN_WIDTH - 120, 20, 100, 40, "QUIT", self.small_font
+        )
+        self.quit_button.normal_color = (200, 50, 50)
+        self.quit_button.hover_color = (255, 70, 70)
+
+        # Create the menu button
+        self.menu_button = Button(
+            SCREEN_WIDTH - 230, 20, 100, 40, "MENU", self.small_font
+        )
+        self.menu_button.normal_color = (70, 70, 200)
+        self.menu_button.hover_color = (100, 100, 255)
 
         self.connector.set_connected_callback(self.on_connected)
         self.connector.set_error_callback(self.on_error)
@@ -84,7 +101,7 @@ class MatchmakingScene(GameScene):
         elif self.state == "ready":
             self.message = "Both players ready. Starting game..."
 
-    def on_match_started(self, match_id: str, color: Color):
+    def on_match_started(self, match_id: str):
         self.message = "Match starting..."
         self.next_scene = OnlinePvPMatchScene(
             self.screen, self.connector, self.match_id, self.opponent
@@ -99,6 +116,10 @@ class MatchmakingScene(GameScene):
 
     def draw(self):
         self.screen.fill((240, 240, 240))
+
+        # Draw buttons
+        self.quit_button.draw(self.screen)
+        self.menu_button.draw(self.screen)
 
         text = self.font.render("Animal Chess Matchmaking", True, (0, 0, 0))
         self.screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 100))
@@ -171,11 +192,27 @@ class MatchmakingScene(GameScene):
     def step(self, events: List[Event]) -> GameScene:
         self.connector.Pump()
 
+        mouse_pos = pygame.mouse.get_pos()
+        self.quit_button.update(mouse_pos)
+        self.menu_button.update(mouse_pos)
+
         if self.next_scene:
             return self.next_scene
 
         for event in events:
-            if event.type == pygame.KEYDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.quit_button.is_clicked(mouse_pos):
+                    self.connector.Disconnect()
+                    pygame.quit()
+                    exit()
+
+                elif self.menu_button.is_clicked(mouse_pos):
+                    from ui.menu_scene import MenuScene
+
+                    self.connector.Disconnect()
+                    return MenuScene(self.screen)
+
+            elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     if self.state == "idle":
                         self.connector.find_game()
@@ -187,6 +224,11 @@ class MatchmakingScene(GameScene):
                         self.connector.cancel_find_game()
                     elif self.state in ["match_found", "ready"]:
                         self.connector.cancel_start_game(self.match_id)
+                    else:
+                        from ui.menu_scene import MenuScene
+
+                        self.connector.Disconnect()
+                        return MenuScene(self.screen)
 
         self.draw()
         return None

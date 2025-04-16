@@ -34,7 +34,6 @@ class MenuScene(GameScene):
             "Computer vs Player",
             "Player vs Player",
             "Online",
-            "Instructions",
             "Quit",
         ]
         self.buttons = []
@@ -64,8 +63,6 @@ class MenuScene(GameScene):
                             connector.Connect()
                             return MatchmakingScene(self.screen, connector)
                         elif i == 3:
-                            pass
-                        elif i == 4:
                             pygame.quit()
                             exit()
         self.draw()

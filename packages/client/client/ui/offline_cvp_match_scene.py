@@ -13,6 +13,7 @@ from ai.ai import AI
 from ai.mcts import MCTSAI
 from ai import mcts
 from ai.minimax import MinimaxAI
+from ui.button import Button
 from ui.game_scene import GameScene
 from ui.constants import (
     SCREEN_WIDTH,
@@ -81,7 +82,20 @@ class OfflineCvPMatchScene(GameScene):
             (TILE_SIZE, TILE_SIZE),
         )
 
+        self.small_font = pygame.font.SysFont(None, 24)
         self.font = pygame.font.SysFont(None, 36)
+
+        self.quit_button = Button(
+            SCREEN_WIDTH - 120, 20, 100, 40, "QUIT", self.small_font
+        )
+        self.quit_button.normal_color = (200, 50, 50)
+        self.quit_button.hover_color = (255, 70, 70)
+
+        self.menu_button = Button(
+            SCREEN_WIDTH - 230, 20, 100, 40, "MENU", self.small_font
+        )
+        self.menu_button.normal_color = (70, 70, 200)
+        self.menu_button.hover_color = (100, 100, 255)
 
         if mode == DifficultyMode.EASY:
             self.ai = MinimaxAI(Color.BLUE, 2)
@@ -229,12 +243,28 @@ class OfflineCvPMatchScene(GameScene):
         )
         self.screen.blit(turn_text, (20, 20))
 
+        self.quit_button.draw(self.screen)
+        self.menu_button.draw(self.screen)
+
     def step(self, events: List[Event]) -> GameScene:
         if self.game.get_turn() == Color.BLUE:
             self.ai.play_with_ai(self.game)
             return None
 
         for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                # Check if any buttons were clicked
+                if self.quit_button.is_clicked(mouse_pos):
+                    self.connector.Disconnect()
+                    pygame.quit()
+                    exit()
+
+                elif self.menu_button.is_clicked(mouse_pos):
+                    from ui.menu_scene import MenuScene
+
+                    self.connector.Disconnect()
+                    return MenuScene(self.screen)
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = self.get_board_mouse_pos(*pygame.mouse.get_pos())
                 if pos is not None:

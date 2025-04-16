@@ -8,6 +8,7 @@ from pygame.event import Event
 from pygame.font import Font
 from pygame.surface import Surface
 from ui.game_scene import GameScene
+from ui.button import Button
 from ui.constants import (
     SCREEN_WIDTH,
     SCREEN_HEIGHT,
@@ -29,6 +30,7 @@ class OnlinePvPMatchScene(GameScene):
     trap_image: Surface
     cave_image: Surface
     font: Font
+    quit_button: Button
 
     game: Game
     screen: Surface
@@ -47,6 +49,7 @@ class OnlinePvPMatchScene(GameScene):
         connector: ServerConnector,
         match_id: str,
         opponent_addr: str,
+        color: Color,
     ):
         pygame.display.set_caption("Animal Chess - Online Match")
         self.game = Game()
@@ -57,17 +60,25 @@ class OnlinePvPMatchScene(GameScene):
         self.selected_piece = None
         self.status_message = "Waiting for opponent..."
 
-        # Determine player color based on opponent address (simple hashing to determine who goes first)
-        # In a real implementation, the server should assign colors
-        hash_sum = sum(ord(c) for c in opponent_addr)
-        self.player_color = Color.RED if hash_sum % 2 == 0 else Color.BLUE
+        self.small_font = pygame.font.SysFont(None, 24)
+        self.quit_button = Button(
+            SCREEN_WIDTH - 120, 20, 100, 40, "QUIT", self.small_font
+        )
+        self.quit_button.normal_color = (200, 50, 50)
+        self.quit_button.hover_color = (255, 70, 70)
 
-        # Set up network callbacks
+        self.menu_button = Button(
+            SCREEN_WIDTH - 230, 20, 100, 40, "MENU", self.small_font
+        )
+        self.menu_button.normal_color = (70, 70, 200)
+        self.menu_button.hover_color = (100, 100, 255)
+
+        self.player_color = color
+
         self.connector.set_move_made_callback(self.on_move_made)
         self.connector.set_game_over_callback(self.on_game_over)
         self.connector.set_error_callback(self.on_error)
 
-        # Load assets
         self.animal_images = self.load_animal_images()
         self.background_image = pygame.transform.scale(
             pygame.image.load(
@@ -92,7 +103,6 @@ class OnlinePvPMatchScene(GameScene):
         )
 
         self.font = pygame.font.SysFont(None, 36)
-        self.small_font = pygame.font.SysFont(None, 24)
 
     def get_board_mouse_pos(self, mouse_x: float, mouse_y: float) -> Optional[Position]:
         col = (mouse_x - BOARD_X) // TILE_SIZE
@@ -101,8 +111,8 @@ class OnlinePvPMatchScene(GameScene):
             return Position(col, row)
         return None
 
-    @staticmethod
     @functools.cache
+    @staticmethod
     def load_animal_images():
         images = {}
         name_to_type = {
@@ -194,6 +204,10 @@ class OnlinePvPMatchScene(GameScene):
         self.screen.blit(self.inner_background_image, (0, 0))
         self.screen.blit(self.background_image, (0, 0))
 
+        # Draw buttons
+        self.quit_button.draw(self.screen)
+        self.menu_button.draw(self.screen)
+
         for row in range(BOARD_ROWS):
             for col in range(BOARD_COLS):
                 rect = pygame.Rect(
@@ -276,6 +290,11 @@ class OnlinePvPMatchScene(GameScene):
     def step(self, events: List[Event]) -> GameScene:
         self.connector.Pump()
 
+        # Update buttons with mouse position
+        mouse_pos = pygame.mouse.get_pos()
+        self.quit_button.update(mouse_pos)
+        self.menu_button.update(mouse_pos)
+
         if self.game.get_turn() != self.player_color and not self.game_over:
             self.status_message = "Opponent's turn"
         elif not self.game_over:
@@ -289,35 +308,57 @@ class OnlinePvPMatchScene(GameScene):
                 self.status_message = "You lost. Game over."
             self.game_over = True
 
-        if self.game.get_turn() == self.player_color and not self.game_over:
-            for event in events:
-                if event.type == pygame.MOUSEBUTTONDOWN:
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                # Check if any buttons were clicked
+                if self.quit_button.is_clicked(mouse_pos):
+                    self.connector.Disconnect()
+                    pygame.quit()
+                    exit()
+
+                elif self.menu_button.is_clicked(mouse_pos):
+                    from ui.menu_scene import MenuScene
+
+                    self.connector.Disconnect()
+                    return MenuScene(self.screen)
+
+                # Handle game piece selection
+                elif self.game.get_turn() == self.player_color and not self.game_over:
                     pos = self.get_board_mouse_pos(*pygame.mouse.get_pos())
                     if pos is not None:
                         piece = self.game.get_state().get_piece_at_position(pos)
                         if piece and piece.color == self.player_color:
                             self.selected_piece = piece
 
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    if self.selected_piece:
-                        mx, my = event.pos
-                        pos = self.get_board_mouse_pos(mx, my)
-                        if pos is not None:
-                            # Try to make the move locally first
-                            result = self.game.move(self.selected_piece, pos)
-                            if result:  # If move was successful locally
-                                # Send move to server
-                                self.connector.move(self.selected_piece, pos)
-                                self.status_message = (
-                                    "Move sent. Waiting for opponent..."
-                                )
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                if (
+                    self.selected_piece
+                    and self.game.get_turn() == self.player_color
+                    and not self.game_over
+                ):
+                    mx, my = event.pos
+                    pos = self.get_board_mouse_pos(mx, my)
+                    if pos is not None:
+                        # Try to make the move locally first
+                        result = self.game.move(self.selected_piece, pos)
+                        if result:  # If move was successful locally
+                            # Send move to server
+                            self.connector.move(self.selected_piece, pos)
+                            self.status_message = "Move sent. Waiting for opponent..."
                     self.selected_piece = None
 
-                elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_c:  # Press 'c' to concede
-                        self.connector.concede()
-                        self.status_message = "You conceded. Game over."
-                        self.game_over = True
+            elif event.type == pygame.KEYDOWN:
+                if (
+                    event.key == pygame.K_c and not self.game_over
+                ):  # Press 'c' to concede
+                    self.connector.concede()
+                    self.status_message = "You conceded. Game over."
+                    self.game_over = True
+                elif event.key == pygame.K_ESCAPE:  # Press ESC to return to menu
+                    from ui.menu_scene import MenuScene
+
+                    self.connector.Disconnect()
+                    return MenuScene(self.screen)
 
         self.draw_board()
 
@@ -334,5 +375,14 @@ class OnlinePvPMatchScene(GameScene):
                 (255, 0, 0) if self.selected_piece.color == Color.RED else (0, 0, 255)
             )
             pygame.draw.circle(self.screen, team_color, (mx, my), TILE_SIZE // 2 - 4, 4)
+
+        if self.game_over:
+            return_text = self.small_font.render(
+                "Press ESC to return to menu", True, (0, 0, 0)
+            )
+            self.screen.blit(
+                return_text,
+                (SCREEN_WIDTH // 2 - return_text.get_width() // 2, SCREEN_HEIGHT - 60),
+            )
 
         return None
