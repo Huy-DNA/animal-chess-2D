@@ -218,7 +218,24 @@ class OfflinePvPMatchScene(GameScene):
         self.menu_button.draw(self.screen)
 
     def step(self, events: List[Event]) -> GameScene:
+        mouse_pos = pygame.mouse.get_pos()
+        self.quit_button.update(mouse_pos)
+        self.menu_button.update(mouse_pos)
+
         for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                # Check if any buttons were clicked
+                if self.quit_button.is_clicked(mouse_pos):
+                    self.connector.Disconnect()
+                    pygame.quit()
+                    exit()
+
+                elif self.menu_button.is_clicked(mouse_pos):
+                    from ui.menu_scene import MenuScene
+
+                    self.connector.Disconnect()
+                    return MenuScene(self.screen)
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = self.get_board_mouse_pos(*pygame.mouse.get_pos())
                 if pos is not None:

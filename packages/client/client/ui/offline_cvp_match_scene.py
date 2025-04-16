@@ -251,6 +251,10 @@ class OfflineCvPMatchScene(GameScene):
             self.ai.play_with_ai(self.game)
             return None
 
+        mouse_pos = pygame.mouse.get_pos()
+        self.quit_button.update(mouse_pos)
+        self.menu_button.update(mouse_pos)
+
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 # Check if any buttons were clicked
